@@ -2,20 +2,27 @@
 ## Minder 
 Like Tinder, but for music.
 
-## Proposal
+## Target Audience
+People who want to go see concerts in their area but want to find/meet people to go with.  
 
-**App Name:** Minder.  
+## Problem
+Often when someone moves, is travelling, or friends do not have similar music tastes, it is hard to find people to go to concerts. By creating a simple way to find people that want to go to the same shows we can alleviate a lot of the stress around going to a show alone.  
 
-**Target Audience:** People who want to go see concerts in their area but want to find/meet people to go with.  
+## Requirements
+We will maintain a user database using Node.js and the Express framework. Each client will interact with the database via AJAX requests to retrieve information on concerts and matching results. We also hope to interface with the soundkick API to collect information on shows near each client.
+### Database
+Will contain all personal information of each user including things like:  
+1. Name  
+2. Location  
+3. Concerts they want to attend  
+4. Chat data  
 
-**Problem:** Often when someone moves, is travelling, or friends do not have similar music tastes, it is hard to find people to go to concerts. By creating a simple way to find people that want to go to the same shows we can alleviate a lot of the stress around going to a show alone.  
+Using this information we will be able to design a matching system based off of what shows people select and where they live.
+## Uniqueness
+There are plenty of sites to find concerts, and they all have a user system, but we could not find a website that was meant to bring people together with similar music taste.  
 
-**Minimum Requirements:** By having a user system we will meet the minimum requirements of a CRUD webpage. We also hope to interface with a music database API which will use AJAX requests.  
-
-**Uniqueness:** There are plenty of sites to find concerts, and they all have a user system, but we could not find a website that was meant to bring people together with similar music taste.  
-
-## Features
-1. User system (CRUD).
+## Feature Overview
+1. User system.
 2. Geolocation based concert feed (Using SongKick API).
 3. Geolocation based matching system.
 4. Chat system.
