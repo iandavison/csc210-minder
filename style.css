@@ -1,0 +1,27 @@
+
+
+html, body {
+    margin: 0;
+    padding: 0;
+}
+#topBanner {
+    height: 75px;
+    width: 100%;
+    background: rgba(0, 121, 39, 0.82);
+    padding: 10px 3%;
+}
+#appName {
+    font-family: serif;
+    color: white;
+}
+
+#showFeed {
+    width: 50%;
+    margin: 0 auto;
+}
+#showList {
+    padding: 0;
+}
+#showList h3 {
+
+}
