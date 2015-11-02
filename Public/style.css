@@ -11,10 +11,25 @@ html, body {
     padding: 10px 3%;
 }
 #appName {
+    margin: 0;
+    width: 30%;
     font-family: serif;
     color: white;
 }
 
+#logIn {
+    float: left;
+    padding: 25px 15px;
+    width: 20%;
+    margin: auto;
+    background: green;
+}
+.logInText {
+    font-size: 16pt;
+    padding: 0;
+    margin: 0;
+    width: 75%;
+}
 #showFeed {
     width: 50%;
     margin: 0 auto;
@@ -22,6 +37,4 @@ html, body {
 #showList {
     padding: 0;
 }
-#showList h3 {
 
-}

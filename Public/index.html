@@ -10,6 +10,17 @@
 <body onload="initPage()">
 <div id="topBanner">
     <h1 id="appName">Minder</h1>
+    <button id="getDB" onclick="getDatabase()">Get Database</button>
+</div>
+
+<div id="logIn">
+    <h3>User Name</h3>
+    <input id="userName" class="logInText" type="text" name="userName" value="aasdf">
+    <h3>Name</h3>
+    <input id="name" class="logInText" type="text" name="name" value="aasdf">
+    <h3>Password</h3>
+    <input id="password" class="logInText" type="text" name="password" value="aasdf">
+    <button onclick="createUser()">Create Account</button>
 </div>
 
 <div id="showFeed">
@@ -21,7 +32,7 @@
 <script type="text/javascript">
     function initPage() {
         if(apiKey == undefined) {
-            alert("You dont have the API Key, Talk to Josh to get it");
+            alert("You dont have the API Key, talk to Josh to get it");
         }
         //Collect client info
         $.getJSON("http://jsonip.com?callback=?", function (data) {
@@ -49,6 +60,50 @@
             list.append("</h3>");
 
         }
+    }
+    function getDatabase() {
+        $.ajax({
+            method: "GET",
+            url: "users/",
+            success: function(data) {
+                console.log(data);
+            },
+            error: function(data) {
+                console.log("ERROR");
+            }
+        });
+    }
+    function createUser() {
+        var fail = false;
+        var un = $("#userName");
+        var n = $("#name");
+        var pw = $("#password");
+        //Make sure all fields are filled out
+        if(un.val().length == 0) {un.css("background", "#FF7777"); fail = true;}
+        else {un.css("background", "#FFFFFF");}
+        if(n.val().length == 0) {n.css("background", "#FF7777"); fail = true;}
+        else {n.css("background", "#FFFFFF");}
+        if(pw.val().length == 0) {pw.css("background", "#FF7777"); fail = true;}
+        else {pw.css("background", "#FFFFFF");}
+        if(fail) {
+            console.log("Fields not filled out.");
+            return;
+        }
+        console.log(un.val() + n.val() + pw.val());
+
+        //Submit finished product
+        $.ajax({
+            type: "POST",
+            dataType: "text",
+            data: {username: un.val(), password: pw.val(), nm: n.val()},
+            url: "users/",
+            success: function(data) {
+                console.log("User Created");
+            },
+            error: function(data) {
+                console.log("ERROR");
+            }
+        });
     }
 </script>
 </html>
