@@ -17,24 +17,45 @@ html, body {
     color: white;
 }
 
-#logIn {
-    float: left;
+.userEntry {
+    position: absolute;
+    left: 25%;
+    top: 20%;
+    margin: auto auto;
     padding: 25px 15px;
-    width: 20%;
-    margin: auto;
+    width: 50%;
     background: green;
 }
 .logInText {
     font-size: 16pt;
     padding: 0;
     margin: 0;
-    width: 75%;
+    width: 100%;
+}
+.loginButton {
+    cursor: pointer;
+    margin: 15px 15px;
+    padding: 2% 2%;
+    text-align: center;
+    width: auto;
+    background: #00CC00;
+    border: solid;
 }
 #showFeed {
+    visibility: hidden;
     width: 50%;
     margin: 0 auto;
 }
 #showList {
     padding: 0;
 }
-
+#db {
+    position: absolute;
+    left: 20%;
+    top: 20%;
+    margin: auto auto;
+    padding: 25px 15px;
+    width: 65%;
+    background: gainsboro;
+    z-index: 4;
+}
