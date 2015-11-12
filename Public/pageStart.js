@@ -167,6 +167,7 @@ function loginUserCookie(user, pass) {
             if(data == "OK") {
                 $("#showFeed").css("visibility", "visible");
                 $.getJSON("http://jsonip.com?callback=?", function (data) {
+                    userHomePage(data.ip, user, pass);
                     getConcerts(data.ip);
                 });
                 //Remove login block
@@ -212,6 +213,7 @@ function loginUser() {
                 document.cookie = "password=" + pw.val() + ";" + expires;
                 //Collect client info to be displayed
                 $.getJSON("http://jsonip.com?callback=?", function (data) {
+                    userHomePage(data.ip, un.val(), pw.val());
                     getConcerts(data.ip);
                 });
                 //Remove login block
@@ -224,6 +226,45 @@ function loginUser() {
         }
     });
 }
+
+/*
+ * This function should have expose the functinoality
+ * to:
+ *  logout
+ *  update the profile connected to it
+ *  delete the profile connected to it
+ *
+ *  And all other main user functionality we want
+ *  i.e. the matching possible chating
+ *
+ *
+ *
+ */
+function userHomePage(ip, user, pass) {
+    $("#topBanner").append(
+        " <button id='updateUser' onclick='updateUser()'>Update User</button>"
+    );
+    $("#topBanner").append(
+        " <button id='logoutUser' onclick='logoutUser()'>Logout</button>"
+    );
+
+}
+
+function logoutUser() {
+    document.cookie = "username=";
+    document.cookie = "password=";
+    location.reload();
+    $("body").remove(".showFeed");
+}
+
+function updateUser() {
+
+}
+
+function buildHomePage(){
+
+}
+
 function createUser() {
     //Ensure all fields are filled
     var fail = false;

@@ -16,6 +16,7 @@ app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 // Serving static files in Public folder
 app.use(express.static("Public"));
+app.use("/Public/libs", express.static(__dirname + "/Public/libs"));
 
 
 var counter = 0;
@@ -45,13 +46,18 @@ app.get('/users', function (req, res) {
     res.send("OK");
 });
 
-app.get('/usersValidate/*', function (req, res) {
-    var nameToLookup = req.params[0];
+app.post('/users/login', function(req, res) {
     // Get DB file
     var db = new sqlite.Database("users.db");
-    console.log("Database----------");
-    db.all("SELECT * FROM Users", function(err, rows) {
-        res.send(JSON.stringify(rows));
+
+    //Check for
+    db.all("SELECT * FROM Users WHERE UserName=\'"+ req.body.username +"\' AND Password=\'"+ req.body.password +"\'", function(err, rows) {
+        if(rows.length > 0) {
+            res.send("OK");
+        }
+        else {
+            res.send("FAIL");
+        }
     });
     db.close();
 });
