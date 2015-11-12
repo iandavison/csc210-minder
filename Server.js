@@ -45,6 +45,17 @@ app.get('/users', function (req, res) {
     res.send("OK");
 });
 
+app.get('/usersValidate/*', function (req, res) {
+    var nameToLookup = req.params[0];
+    // Get DB file
+    var db = new sqlite.Database("users.db");
+    console.log("Database----------");
+    db.all("SELECT * FROM Users", function(err, rows) {
+        res.send(JSON.stringify(rows));
+    });
+    db.close();
+});
+
 var server = app.listen(3000, function () {
     var host = server.address().address;
     var port = server.address().port;

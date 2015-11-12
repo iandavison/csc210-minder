@@ -3,24 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <title>Minder</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script type=""></script>
     <script type="text/javascript" src="key.js"></script>
+    <script type="text/javascript" src="pageStart.js"></script>
+    <script type="text/javascript" src="/Public/libs/jquery-1.11.3.js"></script>
+    <script type="text/javascript" src="/Public/libs/jquery.color-2.1.2.js"></script>
     <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body onload="initPage()">
 <div id="topBanner">
     <h1 id="appName">Minder</h1>
     <button id="getDB" onclick="getDatabase()">Get Database</button>
-</div>
-
-<div id="logIn">
-    <h3>User Name</h3>
-    <input id="userName" class="logInText" type="text" name="userName" value="aasdf">
-    <h3>Name</h3>
-    <input id="name" class="logInText" type="text" name="name" value="aasdf">
-    <h3>Password</h3>
-    <input id="password" class="logInText" type="text" name="password" value="aasdf">
-    <button onclick="createUser()">Create Account</button>
 </div>
 
 <div id="showFeed">
@@ -30,80 +23,6 @@
 </body>
 
 <script type="text/javascript">
-    function initPage() {
-        if(apiKey == undefined) {
-            alert("You dont have the API Key, talk to Josh to get it");
-        }
-        //Collect client info
-        $.getJSON("http://jsonip.com?callback=?", function (data) {
-            getConcerts(data.ip);
-        });
-    }
 
-    //function for collecting
-    function getConcerts(ip) {
-        $.getJSON("http://api.songkick.com/api/3.0/events.json?apikey=" + apiKey + "&location=ip:" + ip,
-            function(data){
-                console.log(data);
-                populateShows(data);
-            });
-    }
-
-    function populateShows(data) {
-        var events = data.resultsPage.results.event;
-        //Collect container
-        var list = $("#showList");
-        //Loop through events and display them
-        for(var i = 0; i < events.length; i++) {
-            list.append("<h3>");
-            list.append(events[i].displayName);
-            list.append("</h3>");
-
-        }
-    }
-    function getDatabase() {
-        $.ajax({
-            method: "GET",
-            url: "users/",
-            success: function(data) {
-                console.log(data);
-            },
-            error: function(data) {
-                console.log("ERROR");
-            }
-        });
-    }
-    function createUser() {
-        var fail = false;
-        var un = $("#userName");
-        var n = $("#name");
-        var pw = $("#password");
-        //Make sure all fields are filled out
-        if(un.val().length == 0) {un.css("background", "#FF7777"); fail = true;}
-        else {un.css("background", "#FFFFFF");}
-        if(n.val().length == 0) {n.css("background", "#FF7777"); fail = true;}
-        else {n.css("background", "#FFFFFF");}
-        if(pw.val().length == 0) {pw.css("background", "#FF7777"); fail = true;}
-        else {pw.css("background", "#FFFFFF");}
-        if(fail) {
-            console.log("Fields not filled out.");
-            return;
-        }
-        console.log(un.val() + n.val() + pw.val());
-
-        //Submit finished product
-        $.ajax({
-            type: "POST",
-            dataType: "text",
-            data: {username: un.val(), password: pw.val(), nm: n.val()},
-            url: "users/",
-            success: function(data) {
-                console.log("User Created");
-            },
-            error: function(data) {
-                console.log("ERROR");
-            }
-        });
-    }
 </script>
 </html>
