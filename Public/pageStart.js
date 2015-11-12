@@ -10,6 +10,8 @@ function initPage() {
     if (apiKey == undefined) {
         alert("You dont have the API Key, talk to Josh to get it");
     }
+    var c = document.cookie;
+
     buildLogIn();
 }
 
@@ -31,31 +33,20 @@ function buildLogIn() {
     banner.after(
         "<div id=\"logIn\" class=\"userEntry\">" +
         "<h3>User Name</h3>" +
-        "<input id=\"userName\" class=\"logInText\" type=\"text\" name=\"userName\" placeholder=\"User Name\">" +
+        "<input id=\"userName\" class=\"logInText\" type=\"text\" placeholder=\"User Name\">" +
         "<h3>Password</h3>" +
-        "<input id=\"password\" class=\"logInText\" type=\"text\" name=\"password\" placeholder=\"Password\">" +
+        "<input id=\"password\" class=\"logInText\" type=\"password\" placeholder=\"Password\">" +
         "<div class='loginButton' id=\"liButton\" onclick=\"loginUser()\">Login</div>" +
         "<div class='loginButton' id=\"cuButton\" onclick=\"buildCreateUser()\">Create New Account</div>" +
         "</div>");
     hoverColorShift($(".loginButton"));
 
 }
-function hoverColorShift(el) {
-    el.hover(
-        function(e) { //MouseIn
-            //$("#" + e.target.id).css("background", "#44ee44");
-            $("#" + e.target.id).animate({backgroundColor: '#44ee44', left: '100px'}, 200);
-        },
-        function (e) { //MouseOut
-            //$("#" + e.target.id).css("background", "#00CC00");
-            $("#" + e.target.id).animate({backgroundColor: '#00CC00'}, 200);
-        });
-}
 function buildCreateUser() {
     var banner = $("#topBanner");
     var oldLogIn = $("#logIn");
     var oldCreateAccount = $("#createAccount");
-    if(oldCreateAccount.length > 0) { //Distroy old create account screen if it exists
+    if(oldCreateAccount.length > 0) { //Destroy old create account screen if it exists
         return;
     }
     if(oldLogIn.length > 0) { //We are already on login screen
@@ -132,6 +123,8 @@ function loginUser() {
         console.log("Fields not filled out.");
         return;
     }
+    //Successful Login, establish cookie
+    document.cookie="username="+ un.val() +"; expires=";
     //Submit finished product
     $.ajax({
         type: "POST",
@@ -156,6 +149,7 @@ function loginUser() {
         }
     });
 }
+
 function createUser() {
     //Ensure all fields are filled
     var fail = false;
@@ -198,4 +192,16 @@ function createUser() {
             console.log("ERROR");
         }
     });
+}
+
+function hoverColorShift(el) {
+    el.hover(
+        function(e) { //MouseIn
+            //$("#" + e.target.id).css("background", "#44ee44");
+            $("#" + e.target.id).animate({backgroundColor: '#44ee44', left: '100px'}, 200);
+        },
+        function (e) { //MouseOut
+            //$("#" + e.target.id).css("background", "#00CC00");
+            $("#" + e.target.id).animate({backgroundColor: '#00CC00'}, 200);
+        });
 }
