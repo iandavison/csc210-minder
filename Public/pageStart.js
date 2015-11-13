@@ -1,5 +1,6 @@
 /**
  * Created by joshstern on 11/8/15.
+ * Getting git to work
  */
 
 
@@ -10,9 +11,15 @@ function initPage() {
     if (apiKey == undefined) {
         alert("You dont have the API Key, talk to Josh to get it");
     }
-    var c = document.cookie;
-
-    buildLogIn();
+    var cookie = document.cookie;
+    var user = cookieToUser(cookie);
+    var pass = cookieToPassword(cookie);
+    if(user != false){
+        loginUserCookie(user, pass);
+    }
+    else {
+        buildLogIn();
+    }
 }
 
 
@@ -33,20 +40,56 @@ function buildLogIn() {
     banner.after(
         "<div id=\"logIn\" class=\"userEntry\">" +
         "<h3>User Name</h3>" +
-        "<input id=\"userName\" class=\"logInText\" type=\"text\" placeholder=\"User Name\">" +
+        "<input id=\"userName\" class=\"logInText\" type=\"text\" name=\"userName\" placeholder=\"User Name\">" +
         "<h3>Password</h3>" +
-        "<input id=\"password\" class=\"logInText\" type=\"password\" placeholder=\"Password\">" +
+        "<input id=\"password\" class=\"logInText\" type=\"text\" name=\"password\" placeholder=\"Password\">" +
         "<div class='loginButton' id=\"liButton\" onclick=\"loginUser()\">Login</div>" +
         "<div class='loginButton' id=\"cuButton\" onclick=\"buildCreateUser()\">Create New Account</div>" +
         "</div>");
     hoverColorShift($(".loginButton"));
 
 }
+function cookieToUser(cookie) {
+    var name = "username" + "=";
+    var cookieSplit = cookie.split(';');
+
+    for(var i=0; i<cookieSplit.length; i++) {
+        var c = cookieSplit[i];
+        while (c.charAt(0)==' ') c = c.substring(1);
+        if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
+    }
+    return "";
+}
+
+function cookieToPassword(cookie) {
+    var name = "password" + "=";
+    var cookieSplit = cookie.split(';');
+
+    for(var i=0; i<cookieSplit.length; i++) {
+        var c = cookieSplit[i];
+        while (c.charAt(0)==' ') c = c.substring(1);
+        if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
+    }
+    return "";
+}
+
+
+function hoverColorShift(el) {
+    el.hover(
+        function(e) { //MouseIn
+            //$("#" + e.target.id).css("background", "#44ee44");
+            $("#" + e.target.id).animate({backgroundColor: '#44ee44', left: '100px'}, 200);
+        },
+        function (e) { //MouseOut
+            //$("#" + e.target.id).css("background", "#00CC00");
+            $("#" + e.target.id).animate({backgroundColor: '#00CC00'}, 200);
+        });
+}
 function buildCreateUser() {
     var banner = $("#topBanner");
     var oldLogIn = $("#logIn");
     var oldCreateAccount = $("#createAccount");
-    if(oldCreateAccount.length > 0) { //Destroy old create account screen if it exists
+    if(oldCreateAccount.length > 0) { //Distroy old create account screen if it exists
         return;
     }
     if(oldLogIn.length > 0) { //We are already on login screen
@@ -109,11 +152,42 @@ function getDatabase() {
         }
     });
 }
+
+function loginUserCookie(user, pass) {
+    //Submit finished product
+    $.ajax({
+        type: "POST",
+        dataType: "text",
+        data: {username: user, password: pass},
+        url: "users/login",
+        success: function(data) {
+            console.log("User Created");
+            if(data == "OK") {
+                $("#showFeed").css("visibility", "visible");
+                $.getJSON("http://jsonip.com?callback=?", function (data) {
+                    userHomePage(data.ip, user, pass);
+                    getConcerts(data.ip);
+                });
+                //Remove login block
+                $("#logIn").remove();
+            }
+
+        },
+        error: function(data) {
+            buildLogIn();
+        }
+    });
+}
+
 function loginUser() {
     //Ensure all fields are filled
     var fail = false;
     var un = $("#userName");
     var pw = $("#password");
+    var d = new Date();
+    var exdays = 2;
+    d.setTime(d.getTime() + (exdays*24*60*60*1000));
+    var expires = "expires="+d.toUTCString();
     //Make sure all fields are filled out
     if(un.val().length == 0) {un.css("background", "#FF7777"); fail = true;}
     else {un.css("background", "#FFFFFF");}
@@ -123,8 +197,6 @@ function loginUser() {
         console.log("Fields not filled out.");
         return;
     }
-    //Successful Login, establish cookie
-    document.cookie="username="+ un.val() +"; expires=";
     //Submit finished product
     $.ajax({
         type: "POST",
@@ -135,8 +207,11 @@ function loginUser() {
             console.log("User Created");
             if(data == "OK") {
                 $("#showFeed").css("visibility", "visible");
+                document.cookie = "username=" + un.val() + ";" + expires;
+                document.cookie = "password=" + pw.val() + ";" + expires;
                 //Collect client info to be displayed
                 $.getJSON("http://jsonip.com?callback=?", function (data) {
+                    userHomePage(data.ip, un.val(), pw.val());
                     getConcerts(data.ip);
                 });
                 //Remove login block
@@ -148,6 +223,44 @@ function loginUser() {
             console.log("ERROR");
         }
     });
+}
+
+/*
+ * This function should have expose the functinoality
+ * to:
+ *  logout
+ *  update the profile connected to it
+ *  delete the profile connected to it
+ *
+ *  And all other main user functionality we want
+ *  i.e. the matching possible chating
+ *
+ *
+ *
+ */
+function userHomePage(ip, user, pass) {
+    $("#topBanner").append(
+        " <button id='updateUser' onclick='updateUser()'>Update User</button>"
+    );
+    $("#topBanner").append(
+        " <button id='logoutUser' onclick='logoutUser()'>Logout</button>"
+    );
+
+}
+
+function logoutUser() {
+    document.cookie = "username=";
+    document.cookie = "password=";
+    location.reload();
+    $("body").remove(".showFeed");
+}
+
+function updateUser() {
+
+}
+
+function buildHomePage(){
+
 }
 
 function createUser() {
@@ -192,16 +305,4 @@ function createUser() {
             console.log("ERROR");
         }
     });
-}
-
-function hoverColorShift(el) {
-    el.hover(
-        function(e) { //MouseIn
-            //$("#" + e.target.id).css("background", "#44ee44");
-            $("#" + e.target.id).animate({backgroundColor: '#44ee44', left: '100px'}, 200);
-        },
-        function (e) { //MouseOut
-            //$("#" + e.target.id).css("background", "#00CC00");
-            $("#" + e.target.id).animate({backgroundColor: '#00CC00'}, 200);
-        });
 }

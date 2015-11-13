@@ -63,6 +63,22 @@ app.get('/users/', function (req, res) {
     db.close();
 });
 
+app.post('/users/login', function(req, res) {
+    // Get DB file
+    var db = new sqlite.Database("users.db");
+
+    //Check for
+    db.all("SELECT * FROM Users WHERE UserName=\'"+ req.body.username +"\' AND Password=\'"+ req.body.password +"\'", function(err, rows) {
+        if(rows.length > 0) {
+            res.send("OK");
+        }
+        else {
+            res.send("FAIL");
+        }
+    });
+    db.close();
+});
+
 var server = app.listen(3000, function () {
     var host = server.address().address;
     var port = server.address().port;
