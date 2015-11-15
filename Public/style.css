@@ -24,12 +24,44 @@ html, body {
     margin: auto;
     background: green;
 }
+
+#userUpdate {
+    float: left;
+    padding: 25px 15px;
+    width: 20%;
+    margin: auto;
+    background: green;
+}
+
+#userDelete {
+    float: left;
+    padding: 25px 15px;
+    width: 20%;
+    margin: auto;
+    background: green;
+}
+
 .logInText {
     font-size: 16pt;
     padding: 0;
     margin: 0;
     width: 75%;
 }
+
+.updateText {
+    font-size: 16pt;
+    padding: 0;
+    margin: 0;
+    width: 75%;
+}
+
+.deleteText {
+    font-size: 16pt;
+    padding: 0;
+    margin: 0;
+    width: 75%;
+}
+
 #showFeed {
     width: 50%;
     margin: 0 auto;
