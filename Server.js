@@ -63,6 +63,38 @@ app.get('/users/', function (req, res) {
     db.close();
 });
 
+app.put('/users/*', function(req, res) {
+    // Get DB file
+    var db = new sqlite.Database("users.db");
+
+    //Check for
+    db.all("UPDATE * FROM Users WHERE UserName=\'"+ req.body.username +"\' AND Password=\'"+ req.body.password +"\'", function(err, rows) {
+        if(rows.length > 0) {
+            res.send("OK");
+        }
+        else {
+            res.send("FAIL");
+        }
+    });
+    db.close();
+});
+
+app.delete('/users/*', function(req, res) {
+    // Get DB file
+    var db = new sqlite.Database("users.db");
+
+    //Check for
+    db.all("DELETE * FROM Users WHERE UserName=\'"+ req.body.username +"\' AND Password=\'"+ req.body.password +"\'", function(err, rows) {
+        if(rows.length > 0) {
+            res.send("OK");
+        }
+        else {
+            res.send("FAIL");
+        }
+    });
+    db.close();
+});
+
 app.post('/users/login', function(req, res) {
     // Get DB file
     var db = new sqlite.Database("users.db");

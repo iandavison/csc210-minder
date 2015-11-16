@@ -240,7 +240,10 @@ function loginUser() {
  */
 function userHomePage(ip, user, pass) {
     $("#topBanner").append(
-        " <button id='updateUser' onclick='updateUser()'>Update User</button>"
+        " <button id='updateUser' onclick='buildUpdateUser()'>Update User</button>"
+    );
+    $("#topBanner").append(
+        " <button id='deleteUser' onclick='buildDeleteUser()'>Delete User</button>"
     );
     $("#topBanner").append(
         " <button id='logoutUser' onclick='logoutUser()'>Logout</button>"
@@ -251,11 +254,54 @@ function userHomePage(ip, user, pass) {
 function logoutUser() {
     document.cookie = "username=";
     document.cookie = "password=";
+    $("#showFeed").remove();
     location.reload();
-    $("body").remove(".showFeed");
+
 }
 
+function buildUpdateUser() {
+    var banner = $("#topBanner");
+    var oldUpdate = $("#userUpdate");
+    if(oldUpdate.length > 0) { //We are already on login screen
+        return;
+    }
+
+    // Build user login
+    banner.after(
+        "<div id=\"userUpdate\" class=\"userEntry\">" +
+        "<h3>User Name</h3>" +
+        "<input id=\"newUserName\" class=\"updateText\" type=\"text\" name=\"newUserName\" placeholder=\"User Name\">" +
+        "<h3>Password</h3>" +
+        "<input id=\"newPassword\" class=\"updateText\" type=\"text\" name=\"newPassword\" placeholder=\"Password\">" +
+        "<div class='updateButton' id=\"upButton\" onclick=\"updateUser()\">Update</div>" +
+        "</div>");
+    hoverColorShift($(".updateButton"));
+}
+
+function buildDeleteUser() {
+    var banner = $("#topBanner");
+    var oldUpdate = $("#userDelete");
+    if(oldUpdate.length > 0) { //We are already on login screen
+        return;
+    }
+
+    // Build user login
+    banner.after(
+        "<div id=\"userDelete\" class=\"userEntry\">" +
+        "<h3>User Name</h3>" +
+        "<input id=\"deleteUserName\" class=\"deleteText\" type=\"text\" name=\"deleteUserName\" placeholder=\"User Name\">" +
+        "<div class='deleteButton' id=\"delButton\" onclick=\"deleteUser()\">Delete</div>" +
+        "</div>");
+    hoverColorShift($(".deleteButton"));
+}
+
+//ajax call with the new info
 function updateUser() {
+
+}
+
+//ajax call with username to delete
+function deleteUser() {
 
 }
 
