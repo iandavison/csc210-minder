@@ -19,12 +19,12 @@ app.use(express.static("Public"));
 app.use("/Public/libs", express.static(__dirname + "/Public/libs"));
 
 
-app.post('/users/create', function (req, res) {
+app.post('/users/*', function (req, res) {
     // Get DB file
     var db = new sqlite.Database("users.db");
-
+    var userCreate = req.params[0];
     //Check for
-    db.run("INSERT INTO Users VALUES (\'"+ req.body.username +"\', \'"+ req.body.password +"\', \'"+ req.body.nm +"\')", function(err) {
+    db.run("INSERT INTO Users VALUES (\'"+ userCreate +"\', \'"+ req.body.password +"\', \'"+ req.body.nm +"\')", function(err) {
         console.log(err);
         if(err == null) {
             res.send("OK");

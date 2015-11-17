@@ -356,8 +356,8 @@ function createUser() {
     $.ajax({
         type: "POST",
         dataType: "text",
-        data: {username: un.val(), password: pw.val(), nm: n.val()},
-        url: "users/create",
+        data: {password: pw.val(), nm: n.val()},
+        url: "users/" + un.val(),
         success: function(data) {
             console.log("User Created");
             if(data == "OK") {
