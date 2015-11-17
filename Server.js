@@ -19,39 +19,47 @@ app.use(express.static("Public"));
 app.use("/Public/libs", express.static(__dirname + "/Public/libs"));
 
 
-var counter = 0;
-app.post('/users', function (req, res) {
+app.post('/users/create', function (req, res) {
     // Get DB file
     var db = new sqlite.Database("users.db");
+
     //Check for
-    db.serialize(function() {
-        db.run("INSERT INTO Users VALUES (\'"+ req.body.username +"\', \'"+ req.body.password +"\', \'"+ req.body.nm +"\')", function(err) {
+    db.run("INSERT INTO Users VALUES (\'"+ req.body.username +"\', \'"+ req.body.password +"\', \'"+ req.body.nm +"\')", function(err) {
+        console.log(err);
+        if(err == null) {
+            res.send("OK");
+        }
+        else {
             console.log("A user with this UserName already exists!");
-        });
+            res.send("FAIL");
+        }
     });
     db.close();
-    res.send("OK");
 });
 
-app.get('/users', function (req, res) {
-    // Get DB file
+app.delete('/users/*', function (req,res) {
+    //get DB file
     var db = new sqlite.Database("users.db");
-    db.serialize(function() {
-        //Make sure users table exists
-        db.each("SELECT * FROM Users", function(err, row) {
-            console.log(row);
-        });
+
+    var userTodelete = req.params[0];
+
+    db.run("DELETE FROM Users WHERE UserName =\'" + userTodelete + "\' AND Password =\'" + req.body.password + "\'", function (err) {
+       if(err == null) {
+           res.send("OK");
+       }
+       else {
+           res.send("FAIL");
+       }
     });
     db.close();
-    res.send("OK");
 });
 
-app.put('/users/*', function(req, res) {
+app.post('/users/login', function(req, res) {
     // Get DB file
     var db = new sqlite.Database("users.db");
 
     //Check for
-    db.all("UPDATE * FROM Users WHERE UserName=\'"+ req.body.username +"\' AND Password=\'"+ req.body.password +"\'", function(err, rows) {
+    db.all("SELECT * FROM Users WHERE UserName=\'"+ req.body.username +"\' AND Password=\'"+ req.body.password +"\'", function(err, rows) {
         if(rows.length > 0) {
             res.send("OK");
         }
@@ -62,18 +70,12 @@ app.put('/users/*', function(req, res) {
     db.close();
 });
 
-app.delete('/users/*', function(req, res) {
+app.get('/users/', function (req, res) {
     // Get DB file
     var db = new sqlite.Database("users.db");
-
-    //Check for
-    db.all("DELETE * FROM Users WHERE UserName=\'"+ req.body.username +"\' AND Password=\'"+ req.body.password +"\'", function(err, rows) {
-        if(rows.length > 0) {
-            res.send("OK");
-        }
-        else {
-            res.send("FAIL");
-        }
+    console.log("Database----------");
+    db.all("SELECT * FROM Users", function(err, rows) {
+        res.send(JSON.stringify(rows));
     });
     db.close();
 });
@@ -99,13 +101,9 @@ var server = app.listen(3000, function () {
     var port = server.address().port;
 
     var db = new sqlite.Database("users.db");
-    db.serialize(function() {
-        //Make sure users table exists
-        db.run("CREATE TABLE IF NOT EXISTS Users (UserName varchar(128) UNIQUE, Password varchar(128), RealName varchar(128))");
-    });
+    //Make sure users table exists
+    db.run("CREATE TABLE IF NOT EXISTS Users (UserName varchar(128) UNIQUE, Password varchar(128), RealName varchar(128))");
     db.close();
 
     console.log('Example app listening at http://%s:%s', host, port);
 });
-
-

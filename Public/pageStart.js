@@ -181,15 +181,22 @@ function loginUserCookie(user, pass) {
     });
 }
 
+function createCookie(user, pass) {
+    var d = new Date();
+    var exdays = 2;
+    d.setTime(d.getTime() + (exdays*24*60*60*1000));
+    var expires = "expires="+d.toUTCString();
+    document.cookie = "username=" + user + ";" + expires;
+    document.cookie = "password=" + pass + ";" + expires;
+}
+
+
 function loginUser() {
     //Ensure all fields are filled
     var fail = false;
     var un = $("#userName");
     var pw = $("#password");
-    var d = new Date();
-    var exdays = 2;
-    d.setTime(d.getTime() + (exdays*24*60*60*1000));
-    var expires = "expires="+d.toUTCString();
+
     //Make sure all fields are filled out
     if(un.val().length == 0) {un.css("background", "#FF7777"); fail = true;}
     else {un.css("background", "#FFFFFF");}
@@ -209,8 +216,7 @@ function loginUser() {
             console.log("User Created");
             if(data == "OK") {
                 $("#showFeed").css("visibility", "visible");
-                document.cookie = "username=" + un.val() + ";" + expires;
-                document.cookie = "password=" + pw.val() + ";" + expires;
+                createCookie(un.val(), pw.val());
                 //Collect client info to be displayed
                 $.getJSON("http://jsonip.com?callback=?", function (data) {
                     userHomePage(data.ip, un.val(), pw.val());
@@ -290,9 +296,7 @@ function buildDeleteUser() {
     // Build user login
     banner.after(
         "<div id=\"userDelete\" class=\"userEntry\">" +
-        "<h3>User Name</h3>" +
-        "<input id=\"deleteUserName\" class=\"deleteText\" type=\"text\" name=\"deleteUserName\" placeholder=\"User Name\">" +
-        "<div class='deleteButton' id=\"delButton\" onclick=\"deleteUser()\">Delete</div>" +
+        "<button id=\"deleteButton\" onclick=\"deleteUser()\">Delete</>" +
         "</div>");
     hoverColorShift($(".deleteButton"));
 }
@@ -304,7 +308,25 @@ function updateUser() {
 
 //ajax call with username to delete
 function deleteUser() {
+    var userPass = cookieToPassword(document.cookie);
+    var userName = cookieToUser(document.cookie);
 
+    $.ajax({
+        type: "DELETE",
+        dataType: "text",
+        data: {password: userPass},
+        url: "users/" + userName,
+        success: function(data) {
+            console.log("User deleted");
+            if(data == "OK") {
+                logoutUser();
+            }
+        },
+        error: function(data){
+            console.log("Error: delete")
+        }
+
+    });
 }
 
 function buildHomePage(){
@@ -340,8 +362,10 @@ function createUser() {
             console.log("User Created");
             if(data == "OK") {
                 $("#showFeed").css("visibility", "visible");
+                createCookie(un.val(), pw.val());
                 //Collect client info to be displayed
                 $.getJSON("http://jsonip.com?callback=?", function (data) {
+                    userHomePage(data.ip, un.val(), pw.val());
                     getConcerts(data.ip);
                 });
                 //Remove login block
