@@ -15,7 +15,7 @@ function initPage() {
     var user = cookieToUser(cookie);
     var pass = cookieToPassword(cookie);
     if(user != false){
-        submitUserCookie(user, pass);
+        login(user, pass);
     }
     else {
         buildLogIn();
@@ -133,7 +133,7 @@ function populateShows(data) {
 function getDatabase() {
     $.ajax({
         method: "GET",
-        url: "users/",
+        url: "userDatabase/",
         success: function(data) {
             $("#topBanner").after(
                 "<div id=\"db\">" +
@@ -148,33 +148,6 @@ function getDatabase() {
         },
         error: function(data) {
             console.log("ERROR");
-        }
-    });
-}
-
-function submitUserCookie(user, pass) {
-    //Submit finished product
-    $.ajax({
-        type: "POST",
-        dataType: "text",
-        data: {username: user, password: pass},
-        url: "users/login",
-        success: function(data) {
-            if(data == "OK") {
-                console.log("LoginSuccess")
-                $("#showFeed").css("visibility", "visible");
-                userHomePage(data.ip, user, pass);
-                getConcerts(data.ip);
-                //Remove login block
-                $("#logIn").remove();
-            }
-            else {
-                buildLogIn();
-            }
-
-        },
-        error: function(data) {
-            buildLogIn();
         }
     });
 }
@@ -211,10 +184,9 @@ function submitUserLogin() {
 function login(un, pw) {
     //Submit finished product
     $.ajax({
-        type: "POST",
+        type: "GET",
         dataType: "text",
-        data: {username: un, password: pw},
-        url: "users/login",
+        url: "userLogIn/" + un + "&" + pw,
         success: function(data) {
             if(data == "OK") {
                 console.log("Login Success");
@@ -226,7 +198,9 @@ function login(un, pw) {
                 //Remove login block
                 $("#logIn").remove();
             }
-
+            else{
+                console.log("Could not login");
+            }
         },
         error: function(data) {
             console.log("ERROR");
@@ -312,10 +286,10 @@ function updateUser() {
         return;
     }
     $.ajax({
-        type: "POST",
+        type: "PUT",
         dataType: "text",
-        data: {oldusername: userName, oldpassword: userPass, newusername: newUsername.val(), newpassword:newPassword.val()},
-        url: "users/edit",
+        data: {oldpassword: userPass, newusername: newUsername.val(), newpassword:newPassword.val()},
+        url: "users/" + userName,
         success: function(data) {
             if(data == "OK") {
                 console.log("User edited")
@@ -336,8 +310,8 @@ function deleteUser() {
     $.ajax({
         type: "DELETE",
         dataType: "text",
-        data: {username: userName, password: userPass},
-        url: "users/",
+        data: {password: userPass},
+        url: "users/" + userName,
         success: function(data) {
             console.log("User deleted");
             if(data == "OK") {
@@ -349,10 +323,6 @@ function deleteUser() {
         }
 
     });
-}
-
-function buildHomePage(){
-
 }
 
 function submitUserCreate() {
@@ -373,15 +343,14 @@ function submitUserCreate() {
         return;
     }
     createUser(un.val(), pw.val(), n.val());
-    console.log(un.val() + n.val() + pw.val());
 }
 function createUser(un, pw, n) {
     //Submit finished product
     $.ajax({
         type: "POST",
         dataType: "text",
-        data: {password: pw, username: un, nm: n},
-        url: "users/create",
+        data: {password: pw, nm: n},
+        url: "users/" + un,
         success: function(data) {
             if(data == "OK") {
                 console.log("User Created");
