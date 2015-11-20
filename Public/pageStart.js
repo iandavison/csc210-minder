@@ -2,7 +2,11 @@
  * Created by joshstern on 11/8/15.
  * Getting git to work
  */
-
+/*
+ * Note code for cookieToUser and cookeToPassowrd
+ * is taken from http://www.w3schools.com/js/js_cookies.asp
+ *
+ */
 
 
 
