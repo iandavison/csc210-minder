@@ -110,9 +110,20 @@ app.get('/userLogIn/*', function(req, res) {
 app.get('/userDatabase', function (req, res) {
     // Get DB file
     var db = new sqlite.Database("users.db");
+    var out = "";
     console.log("Database----------");
     db.all("SELECT * FROM Users", function(err, rows) {
-        res.send(JSON.stringify(rows));
+        out += "Users:<br>";
+        out += JSON.stringify(rows) + "<br>";
+        db.all("SELECT * FROM Requests", function(err, rows){
+            out += "Requests:<br>";
+            out += JSON.stringify(rows) + "<br>";
+            db.all("SELECT * FROM Attendees", function(err, rows) {
+                out += "Attendees:<br>";
+                out += JSON.stringify(rows) + "<br>";
+                res.send(out);
+            });
+        });
     });
     db.close();
 });
@@ -176,7 +187,7 @@ var server = app.listen(3000, function () {
     userDB.run("CREATE TABLE IF NOT EXISTS Users (UserName TEXT UNIQUE, Password TEXT, RealName TEXT)");
 
     //There must be some better way to format this
-    userDB.run("CREATE TABLE IF NOT EXISTS Requests (requestID INTEGER PRIMARY KEY NOT NULL, concert   TEXT NOT NULL, createUser TEXT NOT NULL, numCanAttend INTEGER NOT NULL, numCurAttend INTEGER NOT NULL, concertDate TEXT NOT NULL, location TEXT NOT NULL)");
+    userDB.run("CREATE TABLE IF NOT EXISTS Requests (requestID INTEGER PRIMARY KEY NOT NULL, concert TEXT NOT NULL, createUser TEXT NOT NULL, numCanAttend INTEGER NOT NULL, numCurAttend INTEGER NOT NULL, concertDate TEXT NOT NULL, location TEXT NOT NULL)");
 
     userDB.run("CREATE TABLE IF NOT EXISTS Attendees (requestID INTEGER NOT NULL, attendeeUser TEXT NOT NULL)");
     userDB.close();
