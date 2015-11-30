@@ -1,6 +1,5 @@
 /**
  * Created by joshstern on 11/8/15.
- * Getting git to work
  */
 
 
@@ -48,6 +47,7 @@ function buildLogIn() {
     hoverColorShift($(".button"));
 
 }
+
 function cookieToUser(cookie) {
     var name = "username" + "=";
     var cookieSplit = cookie.split(';');
@@ -152,6 +152,7 @@ function getDatabase() {
     });
 }
 
+
 function createCookie(user, pass) {
     var d = new Date();
     var exdays = 2;
@@ -167,7 +168,6 @@ function submitUserLogin() {
     var fail = false;
     var un = $("#userName");
     var pw = $("#password");
-
     //Make sure all fields are filled out
     if(un.val().length == 0) {un.css("background", "#FF7777"); fail = true;}
     else {un.css("background", "#FFFFFF");}
@@ -208,7 +208,6 @@ function login(un, pw) {
         }
     });
 }
-
 
 /*
  * This function should have expose the functinoality
@@ -345,6 +344,7 @@ function submitUserCreate() {
     }
     createUser(un.val(), pw.val(), n.val());
 }
+
 function createUser(un, pw, n) {
     //Submit finished product
     $.ajax({

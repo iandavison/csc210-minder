@@ -49,6 +49,7 @@ html, body {
     margin: 0;
     width: 100%;
 }
+
 .button {
     cursor: pointer;
     margin: 15px 15px;
@@ -59,15 +60,16 @@ html, body {
     border: solid;
 }
 
-
 #showFeed {
     visibility: hidden;
     width: 50%;
     margin: 0 auto;
 }
+
 #showList {
     padding: 0;
 }
+
 #db {
     position: absolute;
     left: 20%;

@@ -23,6 +23,7 @@ app.post('/users/*', function (req, res) {
     // Get DB file
     var db = new sqlite.Database("users.db");
     var userCreate = req.params[0];
+
     //Check for
     db.run("INSERT INTO Users VALUES (\'"+ userCreate +"\', \'"+ req.body.password +"\', \'"+ req.body.nm +"\')", function(err) {
         console.log(err);
@@ -36,7 +37,6 @@ app.post('/users/*', function (req, res) {
     });
     db.close();
 });
-
 
 app.put('/users/*', function (req, res) {
     console.log("HERE");
@@ -122,10 +122,22 @@ var server = app.listen(3000, function () {
     var host = server.address().address;
     var port = server.address().port;
 
-    var db = new sqlite.Database("users.db");
+    var userDB = new sqlite.Database("users.db");
+    var requestDB = new sqlite.Database("requests.db");
+    var attendeeDB = new sqlite.Databse("attendee.db");
     //Make sure users table exists
-    db.run("CREATE TABLE IF NOT EXISTS Users (UserName TEXT UNIQUE, Password TEXT, RealName TEXT)");
-    db.close();
+    userDB.run("CREATE TABLE IF NOT EXISTS Users (UserName TEXT UNIQUE, Password TEXT, RealName TEXT)");
+    userDB.close();
+
+    //There must be some better way to format this
+    requestDB.run("CREATE TABLE IF NOT EXISTS Requests (requestID INTEGER PRIMARY KEY NOT NULL, concert   TEXT NOT NULL, creatUser TEXT NOT NULL, numCanAttend INTEGER NOT NULL, numCurAttend INTEGER NOT NULL, concertDate TEXT NOT NULL, location TEXT NOT NULL)");
+    requestDB.close();
+
+    attendeeDB.run("CREATE TABLE IF NOT EXISTS Attendees (requestID INTEGER NOT NULL, attendeeUser TEXT NOT NULL)");
+    attendDB.close();
+
+
+
 
     console.log('Example app listening at http://%s:%s', host, port);
 });
