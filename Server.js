@@ -138,16 +138,21 @@ app.get('/attendees/*', function (req, res) {
 });
 
 
-/*
- Given a user get all the requests that they made
- */
-app.get('/requests/*', function (req, res) {
+app.delete('/attendance/*', function (req, res) {
     // Get DB file
-    var db = new sqlite.Database("user.db");
+    var db = new sqlite.Database("users.db");
     var user = req.params[0];
 
-    db.all("SELECT * FROM Requests WHERE createUser = \'" + user +"\'" , function(err, rows) {
-        res.send(JSON.stringify(rows));
+    //Check for
+    db.run("DELETE FROM Attendees WHERE requestID = \'"+ req.body.requestID +"\'AND attendeeUser = \'"+ user +"\')" , function(err) {
+        console.log(err);
+        if(err == null) {
+            res.send("OK");
+        }
+        else {
+            console.log("Error creating request");
+            res.send("FAIL");
+        }
     });
     db.close();
 });
@@ -167,6 +172,71 @@ app.get('/attendance/*', function (req, res) {
     db.close();
 });
 
+/*
+ Given a user get all the requests that they made
+ */
+app.get('/requests/*', function (req, res) {
+    // Get DB file
+    var db = new sqlite.Database("user.db");
+    var user = req.params[0];
+
+    db.all("SELECT * FROM Requests WHERE createUser = \'" + user +"\'" , function(err, rows) {
+        res.send(JSON.stringify(rows));
+    });
+    db.close();
+});
+
+
+app.post('/requests/*', function (req, res) {
+    // Get DB file
+    var db = new sqlite.Database("users.db");
+    var user = req.params[0];
+
+    //Check for
+    db.run("INSERT INTO Requests VALUES (\'"+ req.body.concert +"\', \'"+ user +"\', \'"+ req.body.numCanAttend +
+        "\', \'" + req.body.numCurAttend  + "\' , \'" + req.body.concertDate + "\' , \'" + req.body.concertLocation +"\')" , function(err) {
+        console.log(err);
+        if(err == null) {
+            res.send("OK");
+        }
+        else {
+            console.log("Error creating request");
+            res.send("FAIL");
+        }
+    });
+    db.close();
+});
+
+app.delete('/requests/*', function (req, res) {
+    // Get DB file
+    var db = new sqlite.Database("users.db");
+    var requestID = req.params[0];
+    var runFailed = true;
+    //Check for
+    db.run("DELETE FROM Requests WHERE requestID = \'"+ requestID + "\'", function(err) {
+        console.log(err);
+        if(err == null) {
+            runFailed = false;
+        }
+        else {
+            console.log("Error creating request");
+            res.send("FAIL");
+        }
+    });
+    db.run("DELETE FROM Attendees WHERE requestID = \'"+ requestID + "\'", function(err) {
+        console.log(err);
+        if(err == null) {
+            res.send("OK");
+        }
+        else {
+            console.log("Error creating request");
+            res.send("FAIL");
+        }
+    });
+    db.close();
+});
+
+
 var server = app.listen(3000, function () {
     var host = server.address().address;
     var port = server.address().port;
@@ -176,7 +246,7 @@ var server = app.listen(3000, function () {
     userDB.run("CREATE TABLE IF NOT EXISTS Users (UserName TEXT UNIQUE, Password TEXT, RealName TEXT)");
 
     //There must be some better way to format this
-    userDB.run("CREATE TABLE IF NOT EXISTS Requests (requestID INTEGER PRIMARY KEY NOT NULL, concert   TEXT NOT NULL, createUser TEXT NOT NULL, numCanAttend INTEGER NOT NULL, numCurAttend INTEGER NOT NULL, concertDate TEXT NOT NULL, location TEXT NOT NULL)");
+    userDB.run("CREATE TABLE IF NOT EXISTS Requests (requestID INTEGER PRIMARY KEY NOT NULL, concert TEXT NOT NULL, createUser TEXT NOT NULL, numCanAttend INTEGER NOT NULL, numCurAttend INTEGER NOT NULL, concertDate TEXT NOT NULL, location TEXT NOT NULL)");
 
     userDB.run("CREATE TABLE IF NOT EXISTS Attendees (requestID INTEGER NOT NULL, attendeeUser TEXT NOT NULL)");
     userDB.close();
