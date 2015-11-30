@@ -199,6 +199,7 @@ function login(un, pw) {
                 $("#logIn").remove();
             }
             else{
+                buildLogIn();
                 console.log("Could not login");
             }
         },
