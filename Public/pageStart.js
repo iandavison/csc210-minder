@@ -30,10 +30,9 @@ function buildLogIn() {
     if(oldLogIn.length > 0) { //We are already on login screen
         return;
     }
-    if(oldCreateAccount.length > 0) { //Distroy old create account screen if it exists
+    if(oldCreateAccount.length > 0) { //Destroy old create account screen if it exists
         oldCreateAccount.remove();
     }
-
     // Build user login
     banner.after(
         "<div id=\"logIn\" class=\"userEntry\">" +
@@ -47,43 +46,25 @@ function buildLogIn() {
     hoverColorShift($(".button"));
 
 }
-
-function cookieToUser(cookie) {
-    var name = "username" + "=";
-    var cookieSplit = cookie.split(';');
-
-    for(var i=0; i<cookieSplit.length; i++) {
-        var c = cookieSplit[i];
-        while (c.charAt(0)==' ') c = c.substring(1);
-        if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
+function submitUserLogin() {
+    //Ensure all fields are filled
+    var fail = false;
+    var un = $("#userName");
+    var pw = $("#password");
+    //Make sure all fields are filled out
+    if(un.val().length == 0) {un.css("background", "#FF7777"); fail = true;}
+    else {un.css("background", "#FFFFFF");}
+    if(pw.val().length == 0) {pw.css("background", "#FF7777"); fail = true;}
+    else {pw.css("background", "#FFFFFF");}
+    if(fail) {
+        console.log("Fields not filled out.");
     }
-    return "";
-}
-
-function cookieToPassword(cookie) {
-    var name = "password" + "=";
-    var cookieSplit = cookie.split(';');
-
-    for(var i=0; i<cookieSplit.length; i++) {
-        var c = cookieSplit[i];
-        while (c.charAt(0)==' ') c = c.substring(1);
-        if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
+    else {
+        login(un.val(), pw.val());
     }
-    return "";
+
 }
 
-
-function hoverColorShift(el) {
-    el.hover(
-        function(e) { //MouseIn
-            //$("#" + e.target.id).css("background", "#44ee44");
-            $("#" + e.target.id).animate({backgroundColor: '#44ee44', left: '100px'}, 200);
-        },
-        function (e) { //MouseOut
-            //$("#" + e.target.id).css("background", "#00CC00");
-            $("#" + e.target.id).animate({backgroundColor: '#00CC00'}, 200);
-        });
-}
 function buildCreateUser() {
     var banner = $("#topBanner");
     var oldLogIn = $("#logIn");
@@ -108,6 +89,25 @@ function buildCreateUser() {
         "</div>");
     hoverColorShift($(".button"));
 }
+function submitUserCreate() {
+    //Ensure all fields are filled
+    var fail = false;
+    var un = $("#userName");
+    var n = $("#name");
+    var pw = $("#password");
+    //Make sure all fields are filled out
+    if(un.val().length == 0) {un.css("background", "#FF7777"); fail = true;}
+    else {un.css("background", "#FFFFFF");}
+    if(n.val().length == 0) {n.css("background", "#FF7777"); fail = true;}
+    else {n.css("background", "#FFFFFF");}
+    if(pw.val().length == 0) {pw.css("background", "#FF7777"); fail = true;}
+    else {pw.css("background", "#FFFFFF");}
+    if(fail) {
+        console.log("Fields not filled out.");
+        return;
+    }
+    createUser(un.val(), pw.val(), n.val());
+}
 
 //function for collecting
 function getConcerts(ip) {
@@ -124,32 +124,14 @@ function populateShows(data) {
     var list = $("#showList");
     //Loop through events and display them
     for(var i = 0; i < events.length; i++) {
-        list.append("<h3>");
-        list.append(events[i].displayName);
-        list.append("</h3>");
-
+        list.append("<div class='button' id='sh" + i + "'>" + events[i].displayName + "</div>");
+        $("#sh" + i).click(selectShow)
     }
+    hoverColorShift($(".button"));
 }
-function getDatabase() {
-    $.ajax({
-        method: "GET",
-        url: "userDatabase/",
-        success: function(data) {
-            $("#topBanner").after(
-                "<div id=\"db\">" +
-                data +
-                "</div id=\"db\">");
-            $("body").on("click", function(event) {
-                if(event.target.id != "db") {
-                    $("#db").remove();
-                    $("body").off("click");
-                }
-            });
-        },
-        error: function(data) {
-            console.log("ERROR");
-        }
-    });
+
+function selectShow(ev) {
+    console.log(ev.target.innerText);
 }
 
 
@@ -161,53 +143,32 @@ function createCookie(user, pass) {
     document.cookie = "username=" + user + ";" + expires;
     document.cookie = "password=" + pass + ";" + expires;
 }
+function cookieToUser(cookie) {
+    var name = "username" + "=";
+    var cookieSplit = cookie.split(';');
 
-
-function submitUserLogin() {
-    //Ensure all fields are filled
-    var fail = false;
-    var un = $("#userName");
-    var pw = $("#password");
-    //Make sure all fields are filled out
-    if(un.val().length == 0) {un.css("background", "#FF7777"); fail = true;}
-    else {un.css("background", "#FFFFFF");}
-    if(pw.val().length == 0) {pw.css("background", "#FF7777"); fail = true;}
-    else {pw.css("background", "#FFFFFF");}
-    if(fail) {
-        console.log("Fields not filled out.");
+    for(var i=0; i<cookieSplit.length; i++) {
+        var c = cookieSplit[i];
+        while (c.charAt(0)==' ') c = c.substring(1);
+        if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
     }
-    else {
-        login(un.val(), pw.val());
-    }
+    return "";
+}
+function cookieToPassword(cookie) {
+    var name = "password" + "=";
+    var cookieSplit = cookie.split(';');
 
+    for(var i=0; i<cookieSplit.length; i++) {
+        var c = cookieSplit[i];
+        while (c.charAt(0)==' ') c = c.substring(1);
+        if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
+    }
+    return "";
 }
-function login(un, pw) {
-    //Submit finished product
-    $.ajax({
-        type: "GET",
-        dataType: "text",
-        url: "userLogIn/" + un + "&" + pw,
-        success: function(data) {
-            if(data == "OK") {
-                console.log("Login Success");
-                $("#showFeed").css("visibility", "visible");
-                createCookie(un, pw);
-                //Collect client info to be displayed
-                userHomePage(data.ip, un, pw);
-                getConcerts(data.ip);
-                //Remove login block
-                $("#logIn").remove();
-            }
-            else{
-                buildLogIn();
-                console.log("Could not login");
-            }
-        },
-        error: function(data) {
-            console.log("ERROR");
-        }
-    });
-}
+
+
+
+
 
 /*
  * This function should have expose the functinoality
@@ -251,7 +212,7 @@ function buildUpdateUser() {
         "<input id=\"newUserName\" class=\"editText\" type=\"text\" name=\"newUserName\" placeholder=\"User Name\">" +
         "<h3>Password</h3>" +
         "<input id=\"newPassword\" class=\"editText\" type=\"text\" name=\"newPassword\" placeholder=\"Password\">" +
-        "<div class='button' id=\"upButton\" onclick=\"updateUser()\">Update</div>" +
+        "<div class='button' id=\"upButton\" onclick=\"submitUserUpdate()\">Update</div>" +
         "</div>");
     hoverColorShift($(".button"));
 }
@@ -269,10 +230,11 @@ function buildDeleteUser() {
     hoverColorShift($(".button"));
 }
 
-//ajax call with the new info
-function updateUser() {
-    var userPass = cookieToPassword(document.cookie);
-    var userName = cookieToUser(document.cookie);
+
+
+function submitUserUpdate() {
+    var oldPassword = cookieToPassword(document.cookie);
+    var oldUsername = cookieToUser(document.cookie);
     var newUsername = $("#newUserName");
     var newPassword = $("#newPassword");
     var fail = false;
@@ -281,92 +243,23 @@ function updateUser() {
     else {newUsername.css("background", "#FFFFFF");}
     if(newPassword.val().length == 0) {newPassword.css("background", "#FF7777"); fail = true;}
     else {newPassword.css("background", "#FFFFFF");}
-    if(fail) {
-        console.log("HERE");
-        return;
+    if(!fail) {
+        updateUser(oldUsername, oldPassword, newUsername.val(), newPassword.val());
     }
-    $.ajax({
-        type: "PUT",
-        dataType: "text",
-        data: {oldpassword: userPass, newusername: newUsername.val(), newpassword:newPassword.val()},
-        url: "users/" + userName,
-        success: function(data) {
-            if(data == "OK") {
-                console.log("User edited")
-            }
-            $("#userUpdate").remove();
+
+}
+
+function hoverColorShift(el) {
+    el.hover(
+        function(e) { //MouseIn
+            //$("#" + e.target.id).css("background", "#44ee44");
+            $("#" + e.target.id).animate({backgroundColor: '#44ee44', left: '100px'}, 200);
         },
-        error: function(data){
-            console.log("Error: edit")
-        }
-    });
+        function (e) { //MouseOut
+            //$("#" + e.target.id).css("background", "#00CC00");
+            $("#" + e.target.id).animate({backgroundColor: '#00CC00'}, 200);
+        });
 }
 
-//ajax call with username to delete
-function deleteUser() {
-    var userPass = cookieToPassword(document.cookie);
-    var userName = cookieToUser(document.cookie);
 
-    $.ajax({
-        type: "DELETE",
-        dataType: "text",
-        data: {password: userPass},
-        url: "users/" + userName,
-        success: function(data) {
-            console.log("User deleted");
-            if(data == "OK") {
-                logoutUser();
-            }
-        },
-        error: function(data){
-            console.log("Error: delete")
-        }
 
-    });
-}
-
-function submitUserCreate() {
-    //Ensure all fields are filled
-    var fail = false;
-    var un = $("#userName");
-    var n = $("#name");
-    var pw = $("#password");
-    //Make sure all fields are filled out
-    if(un.val().length == 0) {un.css("background", "#FF7777"); fail = true;}
-    else {un.css("background", "#FFFFFF");}
-    if(n.val().length == 0) {n.css("background", "#FF7777"); fail = true;}
-    else {n.css("background", "#FFFFFF");}
-    if(pw.val().length == 0) {pw.css("background", "#FF7777"); fail = true;}
-    else {pw.css("background", "#FFFFFF");}
-    if(fail) {
-        console.log("Fields not filled out.");
-        return;
-    }
-    createUser(un.val(), pw.val(), n.val());
-}
-
-function createUser(un, pw, n) {
-    //Submit finished product
-    $.ajax({
-        type: "POST",
-        dataType: "text",
-        data: {password: pw, nm: n},
-        url: "users/" + un,
-        success: function(data) {
-            if(data == "OK") {
-                console.log("User Created");
-                $("#showFeed").css("visibility", "visible");
-                createCookie(un, pw);
-                //Collect client info to be displayed
-                userHomePage(data.ip, un, pw);
-                getConcerts();
-                //Remove login block
-                $("#createUser").remove();
-            }
-
-        },
-        error: function(data) {
-            console.log("ERROR");
-        }
-    });
-}
