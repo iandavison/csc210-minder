@@ -15,7 +15,7 @@ function initPage() {
     var user = cookieToUser(cookie);
     var pass = cookieToPassword(cookie);
     if(user != false){
-        loginUserCookie(user, pass);
+        login(user, pass);
     }
     else {
         buildLogIn();
@@ -24,7 +24,6 @@ function initPage() {
 
 
 //Function for building user login
-
 function buildLogIn() {
     var banner = $("#topBanner");
     var oldLogIn = $("#logIn");
@@ -40,17 +39,15 @@ function buildLogIn() {
     banner.after(
         "<div id=\"logIn\" class=\"userEntry\">" +
         "<h3>User Name</h3>" +
-        "<input id=\"userName\" class=\"logInText\" type=\"text\" name=\"userName\" placeholder=\"User Name\">" +
+        "<input id=\"userName\" class=\"editText\" type=\"text\" name=\"userName\" placeholder=\"User Name\">" +
         "<h3>Password</h3>" +
-        "<input id=\"password\" class=\"logInText\" type=\"text\" name=\"password\" placeholder=\"Password\">" +
-        "<div class='loginButton' id=\"liButton\" onclick=\"loginUser()\">Login</div>" +
-        "<div class='loginButton' id=\"cuButton\" onclick=\"buildCreateUser()\">Create New Account</div>" +
+        "<input id=\"password\" class=\"editText\" type=\"text\" name=\"password\" placeholder=\"Password\">" +
+        "<div class='button' id=\"liButton\" onclick=\"submitUserLogin()\">Login</div>" +
+        "<div class='button' id=\"cuButton\" onclick=\"buildCreateUser()\">Create New Account</div>" +
         "</div>");
-    hoverColorShift($(".loginButton"));
+    hoverColorShift($(".button"));
 
 }
-
-
 function cookieToUser(cookie) {
     var name = "username" + "=";
     var cookieSplit = cookie.split(';');
@@ -101,20 +98,20 @@ function buildCreateUser() {
     banner.after(
         "<div id=\"createUser\" class='userEntry'>" +
         "<h3>User Name</h3>" +
-        "<input id=\"userName\" class=\"logInText\" type=\"text\" name=\"userName\" placeholder=\"User Name\">" +
+        "<input id=\"userName\" class=\"editText\" type=\"text\" name=\"userName\" placeholder=\"User Name\">" +
         "<h3>Name</h3>" +
-        "<input id=\"name\" class=\"logInText\" type=\"text\" name=\"name\" placeholder=\"Real Name\">" +
+        "<input id=\"name\" class=\"editText\" type=\"text\" name=\"name\" placeholder=\"Real Name\">" +
         "<h3>Password</h3>" +
-        "<input id=\"password\" class=\"logInText\" type=\"text\" name=\"password\" placeholder=\"Password\">" +
-        "<div class='loginButton' id=\"cuButton\" onclick=\"createUser()\">Create</div>" +
-        "<div class='loginButton' id=\"liButton\" onclick=\"buildLogIn()\">Log in with existing account</div>" +
+        "<input id=\"password\" class=\"editText\" type=\"text\" name=\"password\" placeholder=\"Password\">" +
+        "<div class='button' id=\"cuButton\" onclick=\"submitUserCreate()\">Create</div>" +
+        "<div class='button' id=\"liButton\" onclick=\"buildLogIn()\">Log in with existing account</div>" +
         "</div>");
-    hoverColorShift($(".loginButton"));
+    hoverColorShift($(".button"));
 }
 
 //function for collecting
 function getConcerts(ip) {
-    $.getJSON("http://api.songkick.com/api/3.0/events.json?apikey=" + apiKey + "&location=ip:" + ip,
+    $.getJSON("http://api.songkick.com/api/3.0/events.json?apikey=" + apiKey + "&location=clientip",
         function(data){
             console.log(data);
             populateShows(data);
@@ -136,7 +133,7 @@ function populateShows(data) {
 function getDatabase() {
     $.ajax({
         method: "GET",
-        url: "users/",
+        url: "userDatabase/",
         success: function(data) {
             $("#topBanner").after(
                 "<div id=\"db\">" +
@@ -155,40 +152,22 @@ function getDatabase() {
     });
 }
 
-function loginUserCookie(user, pass) {
-    //Submit finished product
-    $.ajax({
-        type: "POST",
-        dataType: "text",
-        data: {username: user, password: pass},
-        url: "users/login",
-        success: function(data) {
-            console.log("User Created");
-            if(data == "OK") {
-                $("#showFeed").css("visibility", "visible");
-                $.getJSON("http://jsonip.com?callback=?", function (data) {
-                    getConcerts(data.ip);
-                });
-                //Remove login block
-                $("#logIn").remove();
-            }
-
-        },
-        error: function(data) {
-            buildLogIn();
-        }
-    });
-}
-
-function loginUser() {
-    //Ensure all fields are filled
-    var fail = false;
-    var un = $("#userName");
-    var pw = $("#password");
+function createCookie(user, pass) {
     var d = new Date();
     var exdays = 2;
     d.setTime(d.getTime() + (exdays*24*60*60*1000));
     var expires = "expires="+d.toUTCString();
+    document.cookie = "username=" + user + ";" + expires;
+    document.cookie = "password=" + pass + ";" + expires;
+}
+
+
+function submitUserLogin() {
+    //Ensure all fields are filled
+    var fail = false;
+    var un = $("#userName");
+    var pw = $("#password");
+
     //Make sure all fields are filled out
     if(un.val().length == 0) {un.css("background", "#FF7777"); fail = true;}
     else {un.css("background", "#FFFFFF");}
@@ -196,35 +175,157 @@ function loginUser() {
     else {pw.css("background", "#FFFFFF");}
     if(fail) {
         console.log("Fields not filled out.");
-        return;
     }
+    else {
+        login(un.val(), pw.val());
+    }
+
+}
+function login(un, pw) {
     //Submit finished product
     $.ajax({
-        type: "POST",
+        type: "GET",
         dataType: "text",
-        data: {username: un.val(), password: pw.val()},
-        url: "users/login",
+        url: "userLogIn/" + un + "&" + pw,
         success: function(data) {
-            console.log("User Created");
             if(data == "OK") {
+                console.log("Login Success");
                 $("#showFeed").css("visibility", "visible");
-                document.cookie = "username=" + un.val() + ";" + expires;
-                document.cookie = "password=" + pw.val() + ";" + expires;
+                createCookie(un, pw);
                 //Collect client info to be displayed
-                $.getJSON("http://jsonip.com?callback=?", function (data) {
-                    getConcerts(data.ip);
-                });
+                userHomePage(data.ip, un, pw);
+                getConcerts(data.ip);
                 //Remove login block
                 $("#logIn").remove();
             }
-
+            else{
+                console.log("Could not login");
+            }
         },
         error: function(data) {
             console.log("ERROR");
         }
     });
 }
-function createUser() {
+
+
+/*
+ * This function should have expose the functinoality
+ * to:
+ *  logout
+ *  update the profile connected to it
+ *  delete the profile connected to it
+ *
+ *  And all other main user functionality we want
+ *  i.e. the matching possible chating
+ */
+function userHomePage(ip, user, pass) {
+    $("#topBanner").append(
+        " <button id='updateUser' onclick='buildUpdateUser()'>Update User</button>"
+    );
+    $("#topBanner").append(
+        " <button id='deleteUser' onclick='buildDeleteUser()'>Delete User</button>"
+    );
+    $("#topBanner").append(
+        " <button id='logoutUser' onclick='logoutUser()'>Logout</button>"
+    );
+
+}
+
+function logoutUser() {
+    document.cookie = "username=";
+    document.cookie = "password=";
+    location.reload();
+
+}
+
+function buildUpdateUser() {
+    var banner = $("#topBanner");
+    var oldUpdate = $("#userUpdate");
+    if(oldUpdate.length > 0) {
+        return;
+    }
+    banner.after(
+        "<div id=\"userUpdate\" class=\"userEntry\">" +
+        "<h3>User Name</h3>" +
+        "<input id=\"newUserName\" class=\"editText\" type=\"text\" name=\"newUserName\" placeholder=\"User Name\">" +
+        "<h3>Password</h3>" +
+        "<input id=\"newPassword\" class=\"editText\" type=\"text\" name=\"newPassword\" placeholder=\"Password\">" +
+        "<div class='button' id=\"upButton\" onclick=\"updateUser()\">Update</div>" +
+        "</div>");
+    hoverColorShift($(".button"));
+}
+
+function buildDeleteUser() {
+    var banner = $("#topBanner");
+    var oldUpdate = $("#userDelete");
+    if(oldUpdate.length > 0) { //We are already on login screen
+        return;
+    }
+    banner.after(
+        "<div id=\"userDelete\" class=\"userEntry\">" +
+        "<button id=\"button\" onclick=\"deleteUser()\">Delete</>" +
+        "</div>");
+    hoverColorShift($(".button"));
+}
+
+//ajax call with the new info
+function updateUser() {
+    var userPass = cookieToPassword(document.cookie);
+    var userName = cookieToUser(document.cookie);
+    var newUsername = $("#newUserName");
+    var newPassword = $("#newPassword");
+    var fail = false;
+    //Make sure all fields are filled out
+    if(newUsername.val().length == 0) {newUsername.css("background", "#FF7777"); fail = true;}
+    else {newUsername.css("background", "#FFFFFF");}
+    if(newPassword.val().length == 0) {newPassword.css("background", "#FF7777"); fail = true;}
+    else {newPassword.css("background", "#FFFFFF");}
+    if(fail) {
+        console.log("HERE");
+        return;
+    }
+    $.ajax({
+        type: "PUT",
+        dataType: "text",
+        data: {oldpassword: userPass, newusername: newUsername.val(), newpassword:newPassword.val()},
+        url: "users/" + userName,
+        success: function(data) {
+            if(data == "OK") {
+                console.log("User edited")
+            }
+            $("#userUpdate").remove();
+        },
+        error: function(data){
+            console.log("Error: edit")
+        }
+    });
+}
+
+//ajax call with username to delete
+function deleteUser() {
+    var userPass = cookieToPassword(document.cookie);
+    var userName = cookieToUser(document.cookie);
+
+    $.ajax({
+        type: "DELETE",
+        dataType: "text",
+        data: {password: userPass},
+        url: "users/" + userName,
+        success: function(data) {
+            console.log("User deleted");
+            if(data == "OK") {
+                logoutUser();
+            }
+        },
+        error: function(data){
+            console.log("Error: delete")
+        }
+
+    });
+}
+
+function submitUserCreate() {
     //Ensure all fields are filled
     var fail = false;
     var un = $("#userName");
@@ -241,22 +342,23 @@ function createUser() {
         console.log("Fields not filled out.");
         return;
     }
-    console.log(un.val() + n.val() + pw.val());
-
+    createUser(un.val(), pw.val(), n.val());
+}
+function createUser(un, pw, n) {
     //Submit finished product
     $.ajax({
         type: "POST",
         dataType: "text",
-        data: {username: un.val(), password: pw.val(), nm: n.val()},
-        url: "users/create",
+        data: {password: pw, nm: n},
+        url: "users/" + un,
         success: function(data) {
-            console.log("User Created");
             if(data == "OK") {
+                console.log("User Created");
                 $("#showFeed").css("visibility", "visible");
+                createCookie(un, pw);
                 //Collect client info to be displayed
-                $.getJSON("http://jsonip.com?callback=?", function (data) {
-                    getConcerts(data.ip);
-                });
+                userHomePage(data.ip, un, pw);
+                getConcerts();
                 //Remove login block
                 $("#createUser").remove();
             }
