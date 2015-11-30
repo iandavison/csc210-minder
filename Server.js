@@ -107,7 +107,6 @@ app.get('/userLogIn/*', function(req, res) {
 });
 
 
-
 app.get('/userDatabase', function (req, res) {
     // Get DB file
     var db = new sqlite.Database("users.db");
@@ -118,23 +117,69 @@ app.get('/userDatabase', function (req, res) {
     db.close();
 });
 
+/*
+* Here is where all the matching database calls will happen
+*
+*
+*/
+
+/*
+Given a requestID return back all the attendees
+ */
+app.get('/attendees/*', function (req, res) {
+    // Get DB file
+    var db = new sqlite.Database("user.db");
+    var requestID = req.params[0];
+
+    db.all("SELECT * FROM Attendees WHERE requestID = \'" + requestID +"\'" , function(err, rows) {
+        res.send(JSON.stringify(rows));
+    });
+    db.close();
+});
+
+
+/*
+ Given a user get all the requests that they made
+ */
+app.get('/requests/*', function (req, res) {
+    // Get DB file
+    var db = new sqlite.Database("user.db");
+    var user = req.params[0];
+
+    db.all("SELECT * FROM Requests WHERE createUser = \'" + user +"\'" , function(err, rows) {
+        res.send(JSON.stringify(rows));
+    });
+    db.close();
+});
+
+/*
+ Given a user get all the requests they are attending
+ This SQL query needs to be written
+ */
+app.get('/attendance/*', function (req, res) {
+    // Get DB file
+    var db = new sqlite.Database("user.db");
+    var user = req.params[0];
+
+    db.all("SELECT Requsts. FROM Requests, Attendess WHERE attendeeUser = \'" + user +"\'" , function(err, rows) {
+        res.send(JSON.stringify(rows));
+    });
+    db.close();
+});
+
 var server = app.listen(3000, function () {
     var host = server.address().address;
     var port = server.address().port;
 
     var userDB = new sqlite.Database("users.db");
-    var requestDB = new sqlite.Database("requests.db");
-    var attendeeDB = new sqlite.Databse("attendee.db");
     //Make sure users table exists
     userDB.run("CREATE TABLE IF NOT EXISTS Users (UserName TEXT UNIQUE, Password TEXT, RealName TEXT)");
-    userDB.close();
 
     //There must be some better way to format this
-    requestDB.run("CREATE TABLE IF NOT EXISTS Requests (requestID INTEGER PRIMARY KEY NOT NULL, concert   TEXT NOT NULL, creatUser TEXT NOT NULL, numCanAttend INTEGER NOT NULL, numCurAttend INTEGER NOT NULL, concertDate TEXT NOT NULL, location TEXT NOT NULL)");
-    requestDB.close();
+    userDB.run("CREATE TABLE IF NOT EXISTS Requests (requestID INTEGER PRIMARY KEY NOT NULL, concert   TEXT NOT NULL, createUser TEXT NOT NULL, numCanAttend INTEGER NOT NULL, numCurAttend INTEGER NOT NULL, concertDate TEXT NOT NULL, location TEXT NOT NULL)");
 
-    attendeeDB.run("CREATE TABLE IF NOT EXISTS Attendees (requestID INTEGER NOT NULL, attendeeUser TEXT NOT NULL)");
-    attendDB.close();
+    userDB.run("CREATE TABLE IF NOT EXISTS Attendees (requestID INTEGER NOT NULL, attendeeUser TEXT NOT NULL)");
+    userDB.close();
 
 
 
