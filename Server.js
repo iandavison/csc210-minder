@@ -19,12 +19,12 @@ app.use(express.static("Public"));
 app.use("/Public/libs", express.static(__dirname + "/Public/libs"));
 
 
-app.post('/users/*', function (req, res) {
+app.post('/users/create', function (req, res) {
     // Get DB file
     var db = new sqlite.Database("users.db");
-    var userCreate = req.params[0];
+
     //Check for
-    db.run("INSERT INTO Users VALUES (\'"+ userCreate +"\', \'"+ req.body.password +"\', \'"+ req.body.nm +"\')", function(err) {
+    db.run("INSERT INTO Users VALUES (\'"+ req.body.username +"\', \'"+ req.body.password +"\', \'"+ req.body.nm +"\')", function(err) {
         console.log(err);
         if(err == null) {
             res.send("OK");
@@ -33,23 +33,6 @@ app.post('/users/*', function (req, res) {
             console.log("A user with this UserName already exists!");
             res.send("FAIL");
         }
-    });
-    db.close();
-});
-
-app.delete('/users/*', function (req,res) {
-    //get DB file
-    var db = new sqlite.Database("users.db");
-
-    var userTodelete = req.params[0];
-
-    db.run("DELETE FROM Users WHERE UserName =\'" + userTodelete + "\' AND Password =\'" + req.body.password + "\'", function (err) {
-       if(err == null) {
-           res.send("OK");
-       }
-       else {
-           res.send("FAIL");
-       }
     });
     db.close();
 });
@@ -80,22 +63,6 @@ app.get('/users/', function (req, res) {
     db.close();
 });
 
-app.post('/users/login', function(req, res) {
-    // Get DB file
-    var db = new sqlite.Database("users.db");
-
-    //Check for
-    db.all("SELECT * FROM Users WHERE UserName=\'"+ req.body.username +"\' AND Password=\'"+ req.body.password +"\'", function(err, rows) {
-        if(rows.length > 0) {
-            res.send("OK");
-        }
-        else {
-            res.send("FAIL");
-        }
-    });
-    db.close();
-});
-
 var server = app.listen(3000, function () {
     var host = server.address().address;
     var port = server.address().port;
@@ -107,3 +74,5 @@ var server = app.listen(3000, function () {
 
     console.log('Example app listening at http://%s:%s', host, port);
 });
+
+
