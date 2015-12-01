@@ -59,6 +59,15 @@ html, body {
     background: #00CC00;
     border: solid;
 }
+.subButton {
+    cursor: pointer;
+    margin: 15px 15px;
+    padding: 2% 2%;
+    text-align: center;
+    width: 30%;
+    background: #00CC00;
+    border: solid;
+}
 
 #showFeed {
     visibility: hidden;

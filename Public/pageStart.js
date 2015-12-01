@@ -4,7 +4,7 @@
 
 
 
-
+var reqList;
 var showList;
 var selectedShowIndex;
 
@@ -166,7 +166,7 @@ function submitUserUpdate() {
 }
 
 //function for collecting
-function getConcerts(ip) {
+function getConcerts() {
     $.getJSON("http://api.songkick.com/api/3.0/events.json?apikey=" + apiKey + "&location=clientip",
         function(data){
             populateShows(data);
@@ -230,7 +230,27 @@ function buildCreateReq(shIndex) {
     });
     hoverColorShift($(".button"));
 }
+function populateReqs(data, shIndex) {
+    //TODO: Fix this up when actual data is figured out
+    console.log(data);
+    //Collect interesting data
+    reqList = data;
+    //Collect container
+    var parentShow = $("#sh" + shIndex);
 
+    //Build list div for
+    parentShow.after("<div id='reqList'></div>");
+    var list = $("#reqList");
+    //Loop through events and display them
+    for(var i = 0; i < showList.length; i++) {
+        list.append("<div class='subButton' id='re" + i + "'>" + reqList[i].id + "</div>");
+        $("#sh" + i).click(function(ev){
+            selectedShowIndex = ev.target.id.substring(2);
+            getShowReq(selectedShowIndex);
+        });
+    }
+    hoverColorShift($(".button"));
+}
 
 
 function hoverColorShift(el) {
