@@ -3,6 +3,29 @@
  */
 
 
+function createRequest(concert, user, numCanAttend, numCurAttend, concertDate, concertLocation) {
+    //Submit finished product
+    $.ajax({
+        type: "POST",
+        dataType: "text",
+        data: {concert: concert, numCanAttend: numCanAttend, numCurAttend: numCurAttend, concertDate: concertDate, concertLocation: concertLocation},
+        url: "users/" + user,
+        success: function(data) {
+            if(data == "OK") {
+                console.log("Concert Request Created");
+                //Remove login block
+                $("#createReq").remove();
+            }
+            else{
+                console.log("ERROR: Could not create event")
+            }
+
+        },
+        error: function(data) {
+            console.log("ERROR");
+        }
+    });
+}
 
 function createUser(un, pw, n) {
     //Submit finished product
@@ -53,12 +76,12 @@ function deleteUser() {
 }
 
 //ajax call with the new info
-function updateUser(oldPassword, newUsername, newPassword) {
+function updateUser(oldUsername, oldPassword, newUsername, newPassword) {
     $.ajax({
         type: "PUT",
         dataType: "text",
-        data: {oldpassword: oldPassword, newusername: newUsername.val(), newpassword:newPassword.val()},
-        url: "users/" + userName,
+        data: {oldpassword: oldPassword, newusername: newUsername, newpassword: newPassword},
+        url: "users/" + oldUsername,
         success: function(data) {
             if(data == "OK") {
                 console.log("User edited")
@@ -91,6 +114,25 @@ function login(un, pw) {
             else{
                 buildLogIn();
                 console.log("Could not login");
+            }
+        },
+        error: function(data) {
+            console.log("ERROR");
+        }
+    });
+}
+
+function getShowReq(shIndex) {
+    $.ajax({
+        method: "GET",
+        url: "requests/" + showList[shIndex].displayName,
+        success: function(data) {
+            console.log(data);
+            if(data == "") { //No requests for that show
+                buildCreateReq(shIndex);
+            }
+            else{
+                // TODO: Should display available requests (With an option to create a new one)
             }
         },
         error: function(data) {

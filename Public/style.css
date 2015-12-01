@@ -18,7 +18,7 @@ html, body {
 }
 
 .userEntry {
-    position: absolute;
+    position: fixed;
     left: 25%;
     top: 20%;
     margin: auto auto;

@@ -139,7 +139,7 @@ Given a requestID return back all the attendees
  */
 app.get('/attendees/*', function (req, res) {
     // Get DB file
-    var db = new sqlite.Database("user.db");
+    var db = new sqlite.Database("users.db");
     var requestID = req.params[0];
 
     db.all("SELECT * FROM Attendees WHERE requestID = \'" + requestID +"\'" , function(err, rows) {
@@ -154,7 +154,7 @@ app.get('/attendees/*', function (req, res) {
  */
 app.get('/requests/*', function (req, res) {
     // Get DB file
-    var db = new sqlite.Database("user.db");
+    var db = new sqlite.Database("users.db");
     var user = req.params[0];
 
     db.all("SELECT * FROM Requests WHERE createUser = \'" + user +"\'" , function(err, rows) {
@@ -169,7 +169,7 @@ app.get('/requests/*', function (req, res) {
  */
 app.get('/attendance/*', function (req, res) {
     // Get DB file
-    var db = new sqlite.Database("user.db");
+    var db = new sqlite.Database("users.db");
     var user = req.params[0];
 
     db.all("SELECT Requsts. FROM Requests, Attendess WHERE attendeeUser = \'" + user +"\'" , function(err, rows) {

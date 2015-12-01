@@ -5,6 +5,8 @@
 
 
 
+var showList;
+var selectedShowIndex;
 
 function initPage() {
     if (apiKey == undefined) {
@@ -20,13 +22,33 @@ function initPage() {
         buildLogIn();
     }
 }
+/*
+ * This function should have expose the functinoality
+ * to:
+ *  logout
+ *  update the profile connected to it
+ *  delete the profile connected to it
+ *
+ *  And all other main user functionality we want
+ *  i.e. the matching possible chating
+ */
+function userHomePage(ip, user, pass) {
+    $("#topBanner").append(
+        " <button id='updateUser' onclick='buildUpdateUser()'>Update User</button>"
+    );
+    $("#topBanner").append(
+        " <button id='deleteUser' onclick='buildDeleteUser()'>Delete User</button>"
+    );
+    $("#topBanner").append(
+        " <button id='logoutUser' onclick='logoutUser()'>Logout</button>"
+    );
 
-
+}
 //Function for building user login
 function buildLogIn() {
     var banner = $("#topBanner");
     var oldLogIn = $("#logIn");
-    var oldCreateAccount = $("#createAccount");
+    var oldCreateAccount = $("#createUser");
     if(oldLogIn.length > 0) { //We are already on login screen
         return;
     }
@@ -68,7 +90,7 @@ function submitUserLogin() {
 function buildCreateUser() {
     var banner = $("#topBanner");
     var oldLogIn = $("#logIn");
-    var oldCreateAccount = $("#createAccount");
+    var oldCreateAccount = $("#createUser");
     if(oldCreateAccount.length > 0) { //Distroy old create account screen if it exists
         return;
     }
@@ -109,97 +131,6 @@ function submitUserCreate() {
     createUser(un.val(), pw.val(), n.val());
 }
 
-//function for collecting
-function getConcerts(ip) {
-    $.getJSON("http://api.songkick.com/api/3.0/events.json?apikey=" + apiKey + "&location=clientip",
-        function(data){
-            console.log(data);
-            populateShows(data);
-        });
-}
-
-function populateShows(data) {
-    var events = data.resultsPage.results.event;
-    //Collect container
-    var list = $("#showList");
-    //Loop through events and display them
-    for(var i = 0; i < events.length; i++) {
-        list.append("<div class='button' id='sh" + i + "'>" + events[i].displayName + "</div>");
-        $("#sh" + i).click(selectShow)
-    }
-    hoverColorShift($(".button"));
-}
-
-function selectShow(ev) {
-    console.log(ev.target.innerText);
-}
-
-
-function createCookie(user, pass) {
-    var d = new Date();
-    var exdays = 2;
-    d.setTime(d.getTime() + (exdays*24*60*60*1000));
-    var expires = "expires="+d.toUTCString();
-    document.cookie = "username=" + user + ";" + expires;
-    document.cookie = "password=" + pass + ";" + expires;
-}
-function cookieToUser(cookie) {
-    var name = "username" + "=";
-    var cookieSplit = cookie.split(';');
-
-    for(var i=0; i<cookieSplit.length; i++) {
-        var c = cookieSplit[i];
-        while (c.charAt(0)==' ') c = c.substring(1);
-        if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
-    }
-    return "";
-}
-function cookieToPassword(cookie) {
-    var name = "password" + "=";
-    var cookieSplit = cookie.split(';');
-
-    for(var i=0; i<cookieSplit.length; i++) {
-        var c = cookieSplit[i];
-        while (c.charAt(0)==' ') c = c.substring(1);
-        if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
-    }
-    return "";
-}
-
-
-
-
-
-/*
- * This function should have expose the functinoality
- * to:
- *  logout
- *  update the profile connected to it
- *  delete the profile connected to it
- *
- *  And all other main user functionality we want
- *  i.e. the matching possible chating
- */
-function userHomePage(ip, user, pass) {
-    $("#topBanner").append(
-        " <button id='updateUser' onclick='buildUpdateUser()'>Update User</button>"
-    );
-    $("#topBanner").append(
-        " <button id='deleteUser' onclick='buildDeleteUser()'>Delete User</button>"
-    );
-    $("#topBanner").append(
-        " <button id='logoutUser' onclick='logoutUser()'>Logout</button>"
-    );
-
-}
-
-function logoutUser() {
-    document.cookie = "username=";
-    document.cookie = "password=";
-    location.reload();
-
-}
-
 function buildUpdateUser() {
     var banner = $("#topBanner");
     var oldUpdate = $("#userUpdate");
@@ -214,24 +145,9 @@ function buildUpdateUser() {
         "<input id=\"newPassword\" class=\"editText\" type=\"text\" name=\"newPassword\" placeholder=\"Password\">" +
         "<div class='button' id=\"upButton\" onclick=\"submitUserUpdate()\">Update</div>" +
         "</div>");
+
     hoverColorShift($(".button"));
 }
-
-function buildDeleteUser() {
-    var banner = $("#topBanner");
-    var oldUpdate = $("#userDelete");
-    if(oldUpdate.length > 0) { //We are already on login screen
-        return;
-    }
-    banner.after(
-        "<div id=\"userDelete\" class=\"userEntry\">" +
-        "<button id=\"button\" onclick=\"deleteUser()\">Delete</>" +
-        "</div>");
-    hoverColorShift($(".button"));
-}
-
-
-
 function submitUserUpdate() {
     var oldPassword = cookieToPassword(document.cookie);
     var oldUsername = cookieToUser(document.cookie);
@@ -249,17 +165,82 @@ function submitUserUpdate() {
 
 }
 
+//function for collecting
+function getConcerts(ip) {
+    $.getJSON("http://api.songkick.com/api/3.0/events.json?apikey=" + apiKey + "&location=clientip",
+        function(data){
+            populateShows(data);
+        });
+}
+function populateShows(data) {
+    console.log(data);
+    //Collect interesting data
+    showList = data.resultsPage.results.event;
+    //Collect container
+    var list = $("#showList");
+    //Loop through events and display them
+    for(var i = 0; i < showList.length; i++) {
+        list.append("<div class='button' id='sh" + i + "'>" + showList[i].displayName + "</div>");
+        $("#sh" + i).click(function(ev){
+            selectedShowIndex = ev.target.id.substring(2);
+            getShowReq(selectedShowIndex);
+        });
+    }
+    hoverColorShift($(".button"));
+}
+
+function buildDeleteUser() {
+    var banner = $("#topBanner");
+    var oldUpdate = $("#userDelete");
+    if(oldUpdate.length > 0) { //We are already on login screen
+        return;
+    }
+    banner.after(
+        "<div id=\"userDelete\" class=\"userEntry\">" +
+        "<button id=\"button\" onclick=\"deleteUser()\">Delete</>" +
+        "</div>");
+    hoverColorShift($(".button"));
+}
+
+function buildCreateReq(shIndex) {
+    var page = $("body");
+    // Build create request box
+    page.after(
+        "<div id=\"createReq\" class=\"userEntry\">" +
+        "<h3>Create a New Show Request for:</h3>" +
+        "<div id=\"sh"+ shIndex +"\" class=\"editText\" type=\"text\" name=\"userName\"> "+ showList[shIndex].displayName +" </div>" +
+        "<h3>Max Attendees</h3>" +
+        "<input id=\"maxAttend\" class=\"editText\" type=\"text\" name=\"password\" placeholder=\"Number\">" +
+        "<div class='button' id=\"subButton\">Create Request</div>" +
+        "<div class='button' id=\"cButton\">Cancel</div>" +
+        "</div>");
+
+    $("#subButton").click(function(e) {
+        var maxAttend = $("#maxAttend");
+        var fail = false;
+        if(maxAttend.val().length == 0) {maxAttend.css("background", "#FF7777"); fail = true;}
+        else {maxAttend.css("background", "#FFFFFF");}
+        if(!fail) {
+            createRequest(showList[selectedShowIndex].displayName, cookieToUser(document.cookie), maxAttend, 1, showList[selectedShowIndex].start.dateTime, showList[selectedShowIndex].location.city);
+        }
+
+    });
+    $("#cButton").click(function(){
+        $("#createReq").remove();
+    });
+    hoverColorShift($(".button"));
+}
+
+
+
 function hoverColorShift(el) {
     el.hover(
         function(e) { //MouseIn
             //$("#" + e.target.id).css("background", "#44ee44");
-            $("#" + e.target.id).animate({backgroundColor: '#44ee44', left: '100px'}, 200);
+            $("#" + e.target.id).animate({backgroundColor: '#44ee44'}, 200);
         },
         function (e) { //MouseOut
             //$("#" + e.target.id).css("background", "#00CC00");
             $("#" + e.target.id).animate({backgroundColor: '#00CC00'}, 200);
         });
 }
-
-
-
