@@ -369,3 +369,144 @@ function createUser(un, pw, n) {
         }
     });
 }
+
+function testCreateRequest(user) {
+    $.ajax({
+        type: "POST",
+        dataType: "text",
+        data: {concert: "FJM", numCanAttend: 8, numCurAttend: 0, concertDate: "2015-12-15T07:30"},
+        url: "requests/" + user,
+        success: function(data) {
+            if(data == "OK") {
+                console.log("Request Created");
+            }
+
+        },
+        error: function(data) {
+            console.log("ERROR");
+        }
+    });
+}
+
+function testGetRequests(user) {
+    $.ajax({
+        type: "GET",
+        dataType: "text",
+        url: "requests/" + user,
+        success: function(data) {
+            if(data == "OK") {
+                console.log("recieved requests");
+            }
+
+        },
+        error: function(data) {
+            console.log("ERROR");
+        }
+    });
+}
+
+function testUpdateRequests(requestID) {
+    $.ajax({
+        type: "PUT",
+        dataType: "text",
+        data: {numCanAttend: 6, numCurAttend: 0, concertDate: "2015-12-15T07:30", location: "Rochester"},
+        url: "request/" + requestID,
+        success: function(data) {
+            if(data == "OK") {
+                console.log("request updated");
+            }
+
+        },
+        error: function(data) {
+            console.log("ERROR");
+        }
+    });
+}
+
+
+function testDelteRequests(requestID) {
+    $.ajax({
+        type: "DELETE",
+        dataType: "text",
+        url: "requests/" + requestID,
+        success: function(data) {
+            if(data == "OK") {
+                console.log("request deleted");
+            }
+
+        },
+        error: function(data) {
+            console.log("ERROR");
+        }
+    });
+}
+
+function testAttend(user, requestID) {
+    $.ajax({
+        type: "POST",
+        dataType: "text",
+        data: {requestID: requestID},
+        url: "attendance/" + user,
+        success: function(data) {
+            if(data == "OK") {
+                console.log("Event attended");
+            }
+
+        },
+        error: function(data) {
+            console.log("ERROR");
+        }
+    });
+}
+
+function testUnAttend(user, requestID) {
+    $.ajax({
+        type: "DELETE",
+        dataType: "text",
+        data: {requestID: requestID},
+        url: "attendance/" + user,
+        success: function(data) {
+            if(data == "OK") {
+                console.log("Event unattended");
+            }
+
+        },
+        error: function(data) {
+            console.log("ERROR");
+        }
+    });
+}
+
+function testGetAttendance(user) {
+    $.ajax({
+        type: "GET",
+        dataType: "text",
+        url: "attendance/" + user,
+        success: function(data) {
+            if(data == "OK") {
+                console.log("Got attendance");
+            }
+
+        },
+        error: function(data) {
+            console.log("ERROR");
+        }
+    });
+}
+
+function testGetAttendees(requestID) {
+    $.ajax({
+        type: "GET",
+        dataType: "text",
+        url: "attendees/" + requestID,
+        success: function(data) {
+            if(data == "OK") {
+                console.log("Got attendees");
+            }
+
+        },
+        error: function(data) {
+            console.log("ERROR");
+        }
+    });
+}
