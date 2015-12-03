@@ -183,7 +183,7 @@ function populateShows(data) {
         list.append("<div class='button' id='sh" + i + "'>" + showList[i].displayName + "</div>");
         $("#sh" + i).click(function(ev){
             selectedShowIndex = ev.target.id.substring(2);
-            getShowReq(selectedShowIndex);
+            getShowReq();
         });
     }
     hoverColorShift($(".button"));
@@ -202,13 +202,13 @@ function buildDeleteUser() {
     hoverColorShift($(".button"));
 }
 
-function buildCreateReq(shIndex) {
+function buildCreateReq() {
     var page = $("body");
     // Build create request box
     page.after(
         "<div id=\"createReq\" class=\"userEntry\">" +
         "<h3>Create a New Show Request for:</h3>" +
-        "<div id=\"sh"+ shIndex +"\" class=\"editText\" type=\"text\" name=\"userName\"> "+ showList[shIndex].displayName +" </div>" +
+        "<div id=\"sh"+ selectedShowIndex +"\" class=\"editText\" type=\"text\" name=\"userName\"> "+ showList[selectedShowIndex].displayName +" </div>" +
         "<h3>Max Attendees</h3>" +
         "<input id=\"maxAttend\" class=\"editText\" type=\"text\" name=\"password\" placeholder=\"Number\">" +
         "<div class='button' id=\"subButton\">Create Request</div>" +
@@ -221,7 +221,7 @@ function buildCreateReq(shIndex) {
         if(maxAttend.val().length == 0) {maxAttend.css("background", "#FF7777"); fail = true;}
         else {maxAttend.css("background", "#FFFFFF");}
         if(!fail) {
-            createRequest(showList[selectedShowIndex].displayName, cookieToUser(document.cookie), maxAttend, 1, showList[selectedShowIndex].start.dateTime, showList[selectedShowIndex].location.city);
+            createRequest(showList[selectedShowIndex].displayName, cookieToUser(document.cookie), maxAttend.val(), 1, showList[selectedShowIndex].start.dateTime, showList[selectedShowIndex].location.city);
         }
 
     });
@@ -230,20 +230,28 @@ function buildCreateReq(shIndex) {
     });
     hoverColorShift($(".button"));
 }
-function populateReqs(data, shIndex) {
+function populateReqs(data) {
+    console.log(selectedShowIndex);
     //TODO: Fix this up when actual data is figured out
     console.log(data);
     //Collect interesting data
     reqList = data;
     //Collect container
-    var parentShow = $("#sh" + shIndex);
+    var parentShow = $("#sh" + selectedShowIndex);
+    console.log(parentShow);
 
+    var prevList = $("#reqList"+ selectedShowIndex);
+
+
+    if(prevList.length > 0){
+        prevList.remove();
+    }
     //Build list div for
-    parentShow.after("<div id='reqList'></div>");
-    var list = $("#reqList");
+    parentShow.after("<div id='reqList"+ selectedShowIndex +"'></div>");
+    var list = $("#reqList"+ selectedShowIndex);
     //Loop through events and display them
-    for(var i = 0; i < showList.length; i++) {
-        list.append("<div class='subButton' id='re" + i + "'>" + reqList[i].id + "</div>");
+    for(var i = 0; i < reqList.length; i++) {
+        list.append("<div class='subButton' id='re" + i + "'>" + reqList[i].requestID + "</div>");
         $("#sh" + i).click(function(ev){
             selectedShowIndex = ev.target.id.substring(2);
             getShowReq(selectedShowIndex);

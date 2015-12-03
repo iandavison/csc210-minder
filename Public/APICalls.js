@@ -97,17 +97,17 @@ function updateUser(oldUsername, oldPassword, newUsername, newPassword) {
     });
 }
 
-function getShowReq(shIndex) {
+function getShowReq() {
     $.ajax({
         method: "GET",
-        url: "requests/" + showList[shIndex].displayName,
+        url: "requestsForConcert/" + showList[selectedShowIndex].displayName,
         success: function(data) {
             console.log(data);
-            if(data == "") { //No requests for that show
-                buildCreateReq(shIndex);
+            if(data == "[]") { //No requests for that show
+                buildCreateReq();
             }
             else{
-                populateReqs(data, shIndex);
+                populateReqs(JSON.parse(data));
             }
         },
         error: function(data) {
@@ -121,7 +121,7 @@ function createRequest(concert, user, numCanAttend, numCurAttend, concertDate, c
         type: "POST",
         dataType: "text",
         data: {concert: concert, numCanAttend: numCanAttend, numCurAttend: numCurAttend, concertDate: concertDate, concertLocation: concertLocation},
-        url: "users/" + user,
+        url: "requests/" + user,
         success: function(data) {
             if(data == "OK") {
                 console.log("Concert Request Created");
