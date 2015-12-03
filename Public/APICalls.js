@@ -18,12 +18,12 @@ function login(un, pw) {
                 createCookie(un, pw);
                 //Collect client info to be displayed
                 userHomePage(data.ip, un, pw);
-                getConcerts(data.ip);
+
                 //Remove login block
                 $("#logIn").remove();
             }
             else{
-                buildLogIn();
+                buildLoginWindow();
                 console.log("Could not login");
             }
         },
@@ -100,11 +100,11 @@ function updateUser(oldUsername, oldPassword, newUsername, newPassword) {
 function getShowReq() {
     $.ajax({
         method: "GET",
-        url: "requestsForConcert/" + showList[selectedShowIndex].displayName,
+        url: "requestsForConcert/" + showData[selectedShowIndex].displayName,
         success: function(data) {
             console.log(data);
             if(data == "[]") { //No requests for that show
-                buildCreateReq();
+                buildCreateReqWindow();
             }
             else{
                 populateReqs(JSON.parse(data));
@@ -138,8 +138,29 @@ function createRequest(concert, user, numCanAttend, numCurAttend, concertDate, c
         }
     });
 }
-//ajax call with the new info
 
+function addAttendee(user, reqID) {
+    $.ajax({
+        type: "POST",
+        dataType: "text",
+        data: {requestID: reqID},
+        url: "attendance/" + user,
+        success: function(data) {
+            if(data == "OK") {
+                console.log("Added to attendance!");
+            }
+            else{
+                console.log("ERROR: Could not create event")
+            }
+
+        },
+        error: function(data) {
+            console.log("ERROR");
+        }
+    });
+}
+
+//ajax call with the new info
 function getDatabase() {
     $.ajax({
         method: "GET",

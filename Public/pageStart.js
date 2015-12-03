@@ -4,10 +4,10 @@
 
 
 
-var reqList;
-var showList;
+var reqData;
+var showData;
 var selectedShowIndex;
-
+var selectedReqID;
 function initPage() {
     if (apiKey == undefined) {
         alert("You dont have the API Key, talk to Josh to get it");
@@ -19,7 +19,7 @@ function initPage() {
         login(user, pass);
     }
     else {
-        buildLogIn();
+        buildLoginWindow();
     }
 }
 /*
@@ -33,19 +33,21 @@ function initPage() {
  *  i.e. the matching possible chating
  */
 function userHomePage(ip, user, pass) {
-    $("#topBanner").append(
+    var topBanner = $("#topBanner");
+    topBanner.append(
         " <button id='updateUser' onclick='buildUpdateUser()'>Update User</button>"
     );
-    $("#topBanner").append(
+    topBanner.append(
         " <button id='deleteUser' onclick='buildDeleteUser()'>Delete User</button>"
     );
-    $("#topBanner").append(
+    topBanner.append(
         " <button id='logoutUser' onclick='logoutUser()'>Logout</button>"
     );
+    getConcerts();
 
 }
 //Function for building user login
-function buildLogIn() {
+function buildLoginWindow() {
     var banner = $("#topBanner");
     var oldLogIn = $("#logIn");
     var oldCreateAccount = $("#createUser");
@@ -63,7 +65,7 @@ function buildLogIn() {
         "<h3>Password</h3>" +
         "<input id=\"password\" class=\"editText\" type=\"text\" name=\"password\" placeholder=\"Password\">" +
         "<div class='button' id=\"liButton\" onclick=\"submitUserLogin()\">Login</div>" +
-        "<div class='button' id=\"cuButton\" onclick=\"buildCreateUser()\">Create New Account</div>" +
+        "<div class='button' id=\"cuButton\" onclick=\"buildCreateUserWindow()\">Create New Account</div>" +
         "</div>");
     hoverColorShift($(".button"));
 
@@ -87,7 +89,7 @@ function submitUserLogin() {
 
 }
 
-function buildCreateUser() {
+function buildCreateUserWindow() {
     var banner = $("#topBanner");
     var oldLogIn = $("#logIn");
     var oldCreateAccount = $("#createUser");
@@ -107,7 +109,7 @@ function buildCreateUser() {
         "<h3>Password</h3>" +
         "<input id=\"password\" class=\"editText\" type=\"text\" name=\"password\" placeholder=\"Password\">" +
         "<div class='button' id=\"cuButton\" onclick=\"submitUserCreate()\">Create</div>" +
-        "<div class='button' id=\"liButton\" onclick=\"buildLogIn()\">Log in with existing account</div>" +
+        "<div class='button' id=\"liButton\" onclick=\"buildLoginWindow ()\">Log in with existing account</div>" +
         "</div>");
     hoverColorShift($(".button"));
 }
@@ -175,12 +177,12 @@ function getConcerts() {
 function populateShows(data) {
     console.log(data);
     //Collect interesting data
-    showList = data.resultsPage.results.event;
+    showData = data.resultsPage.results.event;
     //Collect container
     var list = $("#showList");
     //Loop through events and display them
-    for(var i = 0; i < showList.length; i++) {
-        list.append("<div class='button' id='sh" + i + "'>" + showList[i].displayName + "</div>");
+    for(var i = 0; i < showData.length; i++) {
+        list.append("<div class='button' id='sh" + i + "'>" + showData[i].displayName + "</div>");
         $("#sh" + i).click(function(ev){
             selectedShowIndex = ev.target.id.substring(2);
             getShowReq();
@@ -202,13 +204,13 @@ function buildDeleteUser() {
     hoverColorShift($(".button"));
 }
 
-function buildCreateReq() {
+function buildCreateReqWindow() {
     var page = $("body");
     // Build create request box
     page.after(
         "<div id=\"createReq\" class=\"userEntry\">" +
         "<h3>Create a New Show Request for:</h3>" +
-        "<div id=\"sh"+ selectedShowIndex +"\" class=\"editText\" type=\"text\" name=\"userName\"> "+ showList[selectedShowIndex].displayName +" </div>" +
+        "<div id=\"sh"+ selectedShowIndex +"\" class=\"editText\" type=\"text\" name=\"userName\"> "+ showData[selectedShowIndex].displayName +" </div>" +
         "<h3>Max Attendees</h3>" +
         "<input id=\"maxAttend\" class=\"editText\" type=\"text\" name=\"password\" placeholder=\"Number\">" +
         "<div class='button' id=\"subButton\">Create Request</div>" +
@@ -221,7 +223,7 @@ function buildCreateReq() {
         if(maxAttend.val().length == 0) {maxAttend.css("background", "#FF7777"); fail = true;}
         else {maxAttend.css("background", "#FFFFFF");}
         if(!fail) {
-            createRequest(showList[selectedShowIndex].displayName, cookieToUser(document.cookie), maxAttend.val(), 1, showList[selectedShowIndex].start.dateTime, showList[selectedShowIndex].location.city);
+            createRequest(showData[selectedShowIndex].displayName, cookieToUser(document.cookie), maxAttend.val(), 1, showData[selectedShowIndex].start.dateTime, showData[selectedShowIndex].location.city);
         }
 
     });
@@ -231,18 +233,12 @@ function buildCreateReq() {
     hoverColorShift($(".button"));
 }
 function populateReqs(data) {
-    console.log(selectedShowIndex);
     //TODO: Fix this up when actual data is figured out
-    console.log(data);
     //Collect interesting data
-    reqList = data;
+    reqData = data;
     //Collect container
     var parentShow = $("#sh" + selectedShowIndex);
-    console.log(parentShow);
-
     var prevList = $("#reqList"+ selectedShowIndex);
-
-
     if(prevList.length > 0){
         prevList.remove();
     }
@@ -250,14 +246,17 @@ function populateReqs(data) {
     parentShow.after("<div id='reqList"+ selectedShowIndex +"'></div>");
     var list = $("#reqList"+ selectedShowIndex);
     //Loop through events and display them
-    for(var i = 0; i < reqList.length; i++) {
-        list.append("<div class='subButton' id='re" + i + "'>" + reqList[i].requestID + "</div>");
-        $("#sh" + i).click(function(ev){
-            selectedShowIndex = ev.target.id.substring(2);
-            getShowReq(selectedShowIndex);
+    for(var i = 0; i < reqData.length; i++) {
+        list.append("<div class='subButton' id='re" + i + "'>" + reqData[i].requestID + "</div>");
+        $("#re" + i).click(function(ev){
+
+            selectedReqID = ev.target.innerText;
+            console.log(selectedReqID);
+            //Add user to list of people going
+            addAttendee(cookieToUser(document.cookie), selectedReqID);
         });
     }
-    hoverColorShift($(".button"));
+    hoverColorShift($(".subButton"));
 }
 
 
