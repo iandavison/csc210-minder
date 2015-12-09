@@ -3,17 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <title>Minder</title>
-    <script type=""></script>
+    <script src=""></script>
     <script type="text/javascript" src="key.js"></script>
     <script type="text/javascript" src="pageStart.js"></script>
-    <script type="text/javascript" src="/Public/libs/jquery-1.11.3.js"></script>
-    <script type="text/javascript" src="/Public/libs/jquery.color-2.1.2.js"></script>
+    <script type="text/javascript" src="APICalls.js"></script>
+    <script type="text/javascript" src="cookieUtility.js"></script>
+    <script type="text/javascript" src="libs/jquery-1.11.3.js"></script>
+    <script type="text/javascript" src="libs/jquery.color-2.1.2.js"></script>
     <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body onload="initPage()">
 <div id="topBanner">
     <h1 id="appName">Minder</h1>
-    <button id="getDB" onclick="getDatabase()">Get Database</button>
+    <button id="getUserDB" onclick="getDatabase()">Get Database</button>
 </div>
 
 <div id="showFeed">

@@ -18,7 +18,7 @@ html, body {
 }
 
 .userEntry {
-    position: absolute;
+    position: fixed;
     left: 25%;
     top: 20%;
     margin: auto auto;
@@ -49,6 +49,7 @@ html, body {
     margin: 0;
     width: 100%;
 }
+
 .button {
     cursor: pointer;
     margin: 15px 15px;
@@ -58,16 +59,26 @@ html, body {
     background: #00CC00;
     border: solid;
 }
-
+.subButton {
+    cursor: pointer;
+    margin: 15px 15px;
+    padding: 2% 2%;
+    text-align: center;
+    width: 30%;
+    background: #00CC00;
+    border: solid;
+}
 
 #showFeed {
     visibility: hidden;
     width: 50%;
     margin: 0 auto;
 }
+
 #showList {
     padding: 0;
 }
+
 #db {
     position: absolute;
     left: 20%;
