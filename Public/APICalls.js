@@ -126,6 +126,30 @@ function getUserAtt(user) {
         }
     });
 }
+function deleteAtt(user) {
+    //Submit finished product
+    $.ajax({
+        type: "DELETE",
+        dataType: "text",
+        data: {requestID: selectedReqID},
+        url: "attendance/" + user,
+        success: function(data) {
+            if(data == "OK") {
+                console.log("Concert Request Created");
+                //Remove login block
+                $("#userReq").remove();
+                $("#ua" + selectedReqID).remove();
+            }
+            else{
+                console.log("ERROR: Could not create event")
+            }
+
+        },
+        error: function(data) {
+            console.log("ERROR");
+        }
+    });
+}
 
 function getShowReq() {
     $.ajax({
@@ -151,7 +175,7 @@ function getReqAttendees() {
         url: "attendees/" + selectedReqID,
         success: function(data) {
             console.log(data);
-            if(data != "[]") { //No requests for that show
+            if(data != "FAIL") { //No requests for that show
                 buildUserReqWindow(JSON.parse(data));
             }
         },
@@ -168,10 +192,12 @@ function createRequest(concert, user, numCanAttend, numCurAttend, concertDate, c
         data: {concert: concert, numCanAttend: numCanAttend, numCurAttend: numCurAttend, concertDate: concertDate, concertLocation: concertLocation},
         url: "requests/" + user,
         success: function(data) {
-            if(data == "OK") {
+            if(data != "FAIL") {
                 console.log("Concert Request Created");
                 //Remove login block
                 $("#createReq").remove();
+                getUserReq(user);
+                getUserAtt(user);
             }
             else{
                 console.log("ERROR: Could not create event")
@@ -195,6 +221,7 @@ function deleteRequest() {
                 //Remove login block
                 $("#userReq").remove();
                 $("#ur" + selectedReqID).remove();
+                $("#ua" + selectedReqID).remove();
             }
             else{
                 console.log("ERROR: Could not create event")

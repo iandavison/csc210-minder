@@ -92,8 +92,6 @@ function buildLoginWindow() {
         "<div class='button' id=\"liButton\" onclick=\"submitUserLogin()\">Login</div>" +
         "<div class='button' id=\"cuButton\" onclick=\"buildCreateUserWindow()\">Create New Account</div>" +
         "</div>");
-    hoverColorShift($(".button"));
-
 }
 function submitUserLogin() {
     //Ensure all fields are filled
@@ -136,7 +134,6 @@ function buildCreateUserWindow() {
         "<div class='button' id=\"cuButton\" onclick=\"submitUserCreate()\">Create</div>" +
         "<div class='button' id=\"liButton\" onclick=\"buildLoginWindow ()\">Log in with existing account</div>" +
         "</div>");
-    hoverColorShift($(".button"));
 }
 function submitUserCreate() {
     //Ensure all fields are filled
@@ -173,7 +170,6 @@ function buildUpdateUser() {
         "<div class='button' id=\"upButton\" onclick=\"submitUserUpdate()\">Update</div>" +
         "</div>");
 
-    hoverColorShift($(".button"));
 }
 function submitUserUpdate() {
     var oldPassword = cookieToPassword(document.cookie);
@@ -213,7 +209,6 @@ function populateShows(data) {
             getShowReq();
         });
     }
-    hoverColorShift($(".button"));
 }
 
 function buildDeleteUser() {
@@ -226,7 +221,6 @@ function buildDeleteUser() {
         "<div id=\"userDelete\" class=\"userEntry\">" +
         "<button id=\"button\" onclick=\"deleteUser()\">Delete</>" +
         "</div>");
-    hoverColorShift($(".button"));
 }
 
 function buildCreateReqWindow() {
@@ -255,7 +249,6 @@ function buildCreateReqWindow() {
     $("#cButton").click(function(){
         $("#createReq").remove();
     });
-    hoverColorShift($(".button"));
 }
 function populateShowReqs(data) {
     //Collect interesting data
@@ -274,21 +267,20 @@ function populateShowReqs(data) {
     for(var i = 0; i < reqData.length; i++) {
         list.append("<div class='subButton' id='re" + i + "'>" + reqData[i].requestID + "</div>");
         $("#re" + i).click(function(ev){
-
             selectedReqID = ev.target.innerText;
             console.log(selectedReqID);
             //Add user to list of people going
             addAttendee(cookieToUser(document.cookie), selectedReqID);
         });
     }
-    hoverColorShift($(".subButton"));
 }
 function populateUserReq(data) {
     userReqData = data;
     var userReqList = $("#userReqList");
+    userReqList.empty();
     for(var i = 0; i < data.length; i++) {
         userReqList.append("<div class='button' id='ur" + data[i].requestID + "'>" + data[i].concert + "</div>");
-        $("#ur" + i).click(function(ev){
+        $("#ur" + data[i].requestID).click(function(ev){
             selectedReqID = ev.target.id.substring(2);
             // Add user to list of people going
             getReqAttendees();
@@ -310,30 +302,36 @@ function buildUserReqWindow() {
         deleteRequest(selectedReqID);
     });
     $("#cButton").click(function(){
-        $("#createReq").remove();
+        $("#userReq").remove();
     });
-    hoverColorShift($(".button"));
 }
 function populateUserAtt(data) {
     userAttData = data;
     var userAttList = $("#userAttendList");
+    userAttList.empty();
     for (var i = 0; i < data.length; i++) {
         userAttList.append("<div class='button' id='ua" + data[i].requestID + "'>" + data[i].concert + "</div>");
-        $("#re" + i).click(function(ev){
+        $("#ua" + data[i].requestID).click(function(ev){
             selectedReqID = ev.target.id.substring(2);
+            buildUserAttWindow();
         });
     }
 }
+function buildUserAttWindow() {
+    var page = $("body");
+    // Build create request box
+    page.after(
+        "<div id=\"userReq\" class=\"userEntry\">" +
+        "<h3>Your Request</h3>" +
+        "<h3>Max Attendees</h3>" +
+        "<div class='button' id=\"unButton\">Unattend Event</div>" +
+        "<div class='button' id=\"cButton\">Cancel</div>" +
+        "</div>");
 
-
-function hoverColorShift(el) {
-    el.hover(
-        function(e) { //MouseIn
-            //$("#" + e.target.id).css("background", "#44ee44");
-            $("#" + e.target.id).animate({backgroundColor: '#44ee44'}, 200);
-        },
-        function (e) { //MouseOut
-            //$("#" + e.target.id).css("background", "#00CC00");
-            $("#" + e.target.id).animate({backgroundColor: '#00CC00'}, 200);
-        });
+    $("#unButton").click(function(e) {
+        deleteAtt(cookieToUser(document.cookie));
+    });
+    $("#cButton").click(function(){
+        $("#userReq").remove();
+    });
 }
