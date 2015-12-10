@@ -17,7 +17,7 @@ function login(un, pw) {
                 $("#showFeed").css("visibility", "visible");
                 createCookie(un, pw);
                 //Collect client info to be displayed
-                userHomePage(data.ip, un, pw);
+                userHomePage(un, pw);
 
                 //Remove login block
                 $("#logIn").remove();
@@ -96,6 +96,35 @@ function updateUser(oldUsername, oldPassword, newUsername, newPassword) {
         }
     });
 }
+function getUserReq(user) {
+    $.ajax({
+        method: "GET",
+        url: "requests/" + user,
+        success: function(data) {
+            console.log(JSON.parse(data));
+            if(data != "[]") {
+
+            }
+        },
+        error: function(data) {
+            console.log("ERROR");
+        }
+    });
+}
+function getUserAtt(user) {
+    $.ajax({
+        method: "GET",
+        url: "attendance/" + user,
+        success: function(data) {
+            console.log(JSON.parse(data));
+            if(data != "[]") {
+            }
+        },
+        error: function(data) {
+            console.log("ERROR");
+        }
+    });
+}
 
 function getShowReq() {
     $.ajax({
@@ -107,7 +136,7 @@ function getShowReq() {
                 buildCreateReqWindow();
             }
             else{
-                populateReqs(JSON.parse(data));
+                populateShowReqs(JSON.parse(data));
             }
         },
         error: function(data) {
