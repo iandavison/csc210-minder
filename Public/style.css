@@ -1,0 +1,104 @@
+
+
+html, body {
+    margin: 0;
+    padding: 0;
+}
+/*The classes*/
+.cleanList {
+    height: 300px;
+    padding: 0;
+    border: solid;
+    margin: 15px;
+    overflow: auto;
+}
+.editText {
+    font-size: 16pt;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+.button {
+    cursor: pointer;
+    margin: 15px 15px;
+    padding: 2% 2%;
+    text-align: center;
+    width: auto;
+    background: #00CC00;
+    border: solid;
+}
+.subButton {
+    cursor: pointer;
+    margin: 15px 15px;
+    padding: 2% 2%;
+    text-align: center;
+    width: 30%;
+    background: #00CC00;
+    border: solid;
+}
+.userEntry {
+    position: fixed;
+    left: 25%;
+    top: 20%;
+    margin: auto auto;
+    padding: 25px 15px;
+    width: 50%;
+    background: green;
+}
+/*Specific id related styles*/
+#topBanner {
+    height: 75px;
+    width: 100%;
+    background: rgba(0, 121, 39, 0.82);
+    padding: 10px 3%;
+}
+#appName {
+    margin: 0;
+    width: 30%;
+    font-family: serif;
+    color: white;
+}
+
+#userUpdate {
+    float: left;
+    padding: 25px 15px;
+    width: 20%;
+    margin: auto;
+    background: green;
+}
+
+#userDelete {
+    float: left;
+    padding: 25px 15px;
+    width: 20%;
+    margin: auto;
+    background: green;
+}
+
+#showFeed {
+    text-align: center;
+    visibility: hidden;
+    float: right;
+    width: 60%;
+    margin: 10px auto;
+}
+#userPanel {
+    visibility: hidden;
+    position: fixed;
+    width: 30%;
+    top: auto;
+    background: #AAFFAA;
+    padding: 10px 10px;
+    margin: 0 auto;
+}
+
+#db {
+    position: absolute;
+    left: 20%;
+    top: 20%;
+    margin: auto auto;
+    padding: 25px 15px;
+    width: 65%;
+    background: gainsboro;
+    z-index: 4;
+}
