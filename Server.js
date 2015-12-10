@@ -25,7 +25,7 @@ app.post('/users/*', function (req, res) {
     var userCreate = req.params[0];
 
     //Check for
-    db.run("INSERT INTO Users VALUES (\""+ userCreate +"\", \""+ req.body.password +"\", \""+ req.body.nm +"\")", function(err) {
+    db.run("INSERT INTO Users VALUES ( ?, ?, ?)", userCreate, req.body.password, req.body.nm, function(err) {
         console.log(err);
         if(err == null) {
             res.send("OK");
@@ -43,7 +43,10 @@ app.put('/users/*', function (req, res) {
     var db = new sqlite.Database("users.db");
     var user = req.params[0];
     //Check for
-    db.run("UPDATE Users SET UserName=\""+ req.body.newusername +"\", Password=\""+ req.body.newpassword +"\" WHERE UserName =\"" + user + "\" AND Password =\"" + req.body.oldpassword + "\"", function(err) {
+    db.run("UPDATE Users " +
+        "SET UserName= ?, Password= ? " +
+        "WHERE UserName = ? AND Password = ?",
+        req.body.newusername, req.body.newpassword, user, req.body.oldpassword, function(err) {
         console.log(err);
         if(err == null) {
             res.send("OK");
@@ -59,7 +62,9 @@ app.delete('/users/*', function (req,res) {
     //get DB file
     var db = new sqlite.Database("users.db");
     var user = req.params[0];
-    db.run("DELETE FROM Users WHERE UserName =\"" + user + "\" AND Password =\"" + req.body.password + "\"", function (err) {
+    db.run("DELETE " +
+        "FROM Users " +
+        "WHERE UserName = ? AND Password = ?", user, req.body.password, function (err) {
        if(err == null) {
            res.send("OK");
        }
@@ -95,7 +100,9 @@ app.get('/userLogIn/*', function(req, res) {
     var password = data[1];
     console.log(user + ":" + password);
     //Check for
-    db.all("SELECT * FROM Users WHERE UserName=\""+ user +"\" AND Password=\""+ password +"\"", function(err, rows) {
+    db.all("SELECT * " +
+        "FROM Users " +
+        "WHERE UserName= ? AND Password= ?", user, password, function(err, rows) {
         if(rows.length > 0) {
             res.send("OK");
         }
@@ -142,7 +149,9 @@ app.get('/attendees/*', function (req, res) {
     var db = new sqlite.Database("users.db");
     var requestID = req.params[0];
 
-    db.all("SELECT * FROM Attendees WHERE requestID = \"" + requestID +"\"" , function(err, rows) {
+    db.all("SELECT * " +
+        "FROM Attendees " +
+        "WHERE requestID = ?" , requestID, function(err, rows) {
         console.log(err);
         res.send(JSON.stringify(rows));
     });
@@ -155,13 +164,19 @@ app.post('/attendance/*', function (req, res) {
     var user = req.params[0];
 
     //Check for
-    db.run("INSERT INTO Attendees VALUES (\"" + req.body.requestID + "\", \"" + user + "\")" , function(err) {
+    db.run("INSERT INTO Attendees VALUES (?, ?)",
+        req.body.requestID, user, function(err) {
         console.log(err);
         if(err == null) {
+            db.run("UPDATE Requests " +
+                "SET numCurAttend = numCurAttend + 1 " +
+                "WHERE requestID = ?", req.body.requestID, function(err) {
+                console.log(err);
+            });
             res.send("OK");
         }
         else {
-            console.log("Error creating request");
+            console.log("Error creating attendence");
             res.send("FAIL");
         }
     });
@@ -174,7 +189,9 @@ app.delete('/attendance/*', function (req, res) {
     var user = req.params[0];
 
     //Check for
-    db.run("DELETE FROM Attendees WHERE requestID = \"" + req.body.requestID + "\" AND user = \"" + user + "\"" , function(err) {
+    db.run("DELETE " +
+        "FROM Attendees " +
+        "WHERE requestID = ? AND user = ?", req.body.requestID, user, function(err) {
         console.log(err);
         if(err == null) {
             res.send("OK");
@@ -205,7 +222,7 @@ app.get('/attendance/*', function (req, res) {
         "Requests.concertDate, " +
         "Requests.location " +
         "FROM Requests, Attendees " +
-        "WHERE Requests.requestID = Attendees.requestID AND Attendees.user = \"" + user + "\"" , function(err, rows) {
+        "WHERE Requests.requestID = Attendees.requestID AND Attendees.user = ?" , user, function(err, rows) {
         console.log(rows);
         res.send(JSON.stringify(rows));
     });
@@ -220,7 +237,9 @@ app.get('/requests/*', function (req, res) {
     var db = new sqlite.Database("users.db");
     var user = req.params[0];
     console.log("Request made for users: " + user);
-    db.all("SELECT * FROM Requests WHERE createUser = \"" + user +"\"" , function(err, rows) {
+    db.all("SELECT * " +
+        "FROM Requests " +
+        "WHERE createUser = ?" , user, function(err, rows) {
         console.log(err);
         res.send(JSON.stringify(rows));
     });
@@ -232,7 +251,9 @@ app.get('/requestsForConcert/*', function (req, res) {
     var db = new sqlite.Database("users.db");
     var concert = req.params[0];
 
-    db.all("SELECT * FROM Requests WHERE concert = \"" + concert +"\"" , function(err, rows) {
+    db.all("SELECT * " +
+        "FROM Requests " +
+        "WHERE concert = ?" , concert, function(err, rows) {
         res.send(JSON.stringify(rows));
     });
     db.close();
@@ -245,10 +266,16 @@ app.post('/requests/*', function (req, res) {
 
     //Check for
     db.run("INSERT INTO Requests (concert, createUser, numCanAttend, numCurAttend, concertDate, location)" +
-        " VALUES (\""+ req.body.concert +"\", \""+ user +"\", \""+ req.body.numCanAttend +
-        "\", \"" + req.body.numCurAttend  + "\" , \"" + req.body.concertDate + "\" , \"" + req.body.concertLocation +"\")" , function(err) {
+        " VALUES (?, ?, ?, ?, ?, ?)",
+        req.body.concert, user, req.body.numCanAttend, req.body.numCurAttend,
+        req.body.concertDate, req.body.concertLocation, function(err) {
+
         console.log(err);
         if(err == null) {
+            db.run("INSERT INTO Attendees VALUES(?, ?)", this.lastID, user, function(err){
+                console.log(err);
+            });
+
             res.send("OK");
         }
         else {
@@ -265,9 +292,11 @@ app.put('/requests/*', function (req, res) {
     var requestID = req.params[0];
 
     //Check for
-    db.run("UPDATE Requests SET numCanAttend  = \"" + req.body.numCanAttend + "\" , numCurAttend = \"" +
-        req.body.numCurAttend + "\" , concertDate = \"" + req.body.concertDate + "\" , location  = \"" +
-        req.body.location + "\" WHERE requestID = \"" + requestID + "\"", function(err) {
+    db.run("UPDATE Requests " +
+        "SET numCanAttend  = ?, numCurAttend = ?, concertDate = ?, location  = ? " +
+        "WHERE requestID = ?",
+        req.body.numCanAttend, req.body.numCurAttend,
+        req.body.concertDate, req.body.location, requestID, function(err) {
         console.log(err);
         if(err == null) {
             res.send("OK");
@@ -286,7 +315,9 @@ app.delete('/requests/*', function (req, res) {
     var requestID = req.params[0];
     var runFailed = true;
     //Check for
-    db.run("DELETE FROM Requests WHERE requestID = \""+ requestID + "\"", function(err) {
+    db.run("DELETE " +
+        "FROM Requests " +
+        "WHERE requestID = ?", requestID, function(err) {
         console.log(err);
         if(err == null) {
             runFailed = false;
@@ -296,7 +327,9 @@ app.delete('/requests/*', function (req, res) {
             res.send("FAIL");
         }
     });
-    db.run("DELETE FROM Attendees WHERE requestID = \""+ requestID + "\"", function(err) {
+    db.run("DELETE " +
+        "FROM Attendees " +
+        "WHERE requestID = ?", requestID, function(err) {
         console.log(err);
         if(err == null) {
             res.send("OK");

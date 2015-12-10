@@ -243,7 +243,7 @@ function buildCreateReqWindow() {
         if(maxAttend.val().length == 0) {maxAttend.css("background", "#FF7777"); fail = true;}
         else {maxAttend.css("background", "#FFFFFF");}
         if(!fail) {
-            createRequest(showData[selectedShowIndex].displayName, cookieToUser(document.cookie), maxAttend.val(), 1, showData[selectedShowIndex].start.dateTime, showData[selectedShowIndex].location.city);
+            createRequest(showData[selectedShowIndex].displayName, cookieToUser(document.cookie), maxAttend.val(), 1, showData[selectedShowIndex].start.datetime, showData[selectedShowIndex].location.city);
         }
 
     });

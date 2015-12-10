@@ -179,7 +179,7 @@ function addAttendee(user, reqID) {
                 console.log("Added to attendance!");
             }
             else{
-                console.log("ERROR: Could not create event")
+                console.log("ERROR: Could not attend")
             }
 
         },
