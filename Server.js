@@ -205,8 +205,8 @@ app.get('/attendance/*', function (req, res) {
         "Requests.concertDate, " +
         "Requests.location " +
         "FROM Requests, Attendees " +
-        "WHERE Requests.requestID = Attendees.requestID AND Attendees.user = \"" + user +" \"" , function(err, rows) {
-        console.log(err);
+        "WHERE Requests.requestID = Attendees.requestID AND Attendees.user = \"" + user + "\"" , function(err, rows) {
+        console.log(rows);
         res.send(JSON.stringify(rows));
     });
     db.close();
@@ -309,7 +309,6 @@ app.delete('/requests/*', function (req, res) {
     db.close();
 });
 
-
 var server = app.listen(3000, function () {
     var host = server.address().address;
     var port = server.address().port;
@@ -328,7 +327,8 @@ var server = app.listen(3000, function () {
         "concertDate TEXT NOT NULL, " +
         "location TEXT NOT NULL)");
 
-    userDB.run("CREATE TABLE IF NOT EXISTS Attendees (requestID INTEGER NOT NULL, user TEXT NOT NULL)");
+    userDB.run("CREATE TABLE IF NOT EXISTS Attendees (requestID INTEGER NOT NULL, user TEXT NOT NULL, " +
+        "UNIQUE (requestID, user))");
     userDB.close();
 
 

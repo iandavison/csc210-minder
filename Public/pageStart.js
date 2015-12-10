@@ -46,6 +46,24 @@ function userHomePage(ip, user, pass) {
     getConcerts();
 
 }
+
+/*
+ * Will contain an ajax call to get requests/user
+ *
+ *
+ */
+function requestsSideBar(user) {
+
+}
+
+/*
+ * Will contain an ajax call to get attendance/user
+ *
+ *
+ */
+function attendanceSideBar(user) {
+
+}
 //Function for building user login
 function buildLoginWindow() {
     var banner = $("#topBanner");
@@ -236,6 +254,7 @@ function populateReqs(data) {
     //TODO: Fix this up when actual data is figured out
     //Collect interesting data
     reqData = data;
+
     //Collect container
     var parentShow = $("#sh" + selectedShowIndex);
     var prevList = $("#reqList"+ selectedShowIndex);
