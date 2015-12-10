@@ -32,7 +32,7 @@ function initPage() {
  *  And all other main user functionality we want
  *  i.e. the matching possible chating
  */
-function userHomePage(ip, user, pass) {
+function userHomePage(user, pass) {
     var topBanner = $("#topBanner");
     topBanner.append(
         " <button id='updateUser' onclick='buildUpdateUser()'>Update User</button>"
@@ -43,6 +43,8 @@ function userHomePage(ip, user, pass) {
     topBanner.append(
         " <button id='logoutUser' onclick='logoutUser()'>Logout</button>"
     );
+    getUserReq(user);
+    getUserAtt(user);
     getConcerts();
 
 }
@@ -232,7 +234,7 @@ function buildCreateReqWindow() {
     });
     hoverColorShift($(".button"));
 }
-function populateReqs(data) {
+function populateShowReqs(data) {
     //TODO: Fix this up when actual data is figured out
     //Collect interesting data
     reqData = data;
