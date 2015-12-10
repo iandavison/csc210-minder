@@ -6,8 +6,12 @@
 
 var reqData;
 var showData;
+var userReqData;
+var userAttData;
 var selectedShowIndex;
 var selectedReqID;
+
+
 function initPage() {
     if (apiKey == undefined) {
         alert("You dont have the API Key, talk to Josh to get it");
@@ -45,6 +49,7 @@ function userHomePage(user, pass) {
     );
     getUserReq(user);
     getUserAtt(user);
+    $("#userPanel").css("visibility", "visible");
     getConcerts();
 
 }
@@ -235,7 +240,6 @@ function buildCreateReqWindow() {
     hoverColorShift($(".button"));
 }
 function populateShowReqs(data) {
-    //TODO: Fix this up when actual data is figured out
     //Collect interesting data
     reqData = data;
     //Collect container
@@ -259,6 +263,47 @@ function populateShowReqs(data) {
         });
     }
     hoverColorShift($(".subButton"));
+}
+function populateUserReq(data) {
+    userReqData = data;
+    var userReqList = $("#userReqList");
+    for(var i = 0; i < data.length; i++) {
+        userReqList.append("<div class='button' id='ur" + data[i].requestID + "'>" + data[i].concert + "</div>");
+        $("#ur" + i).click(function(ev){
+            selectedReqID = ev.target.id.substring(2);
+            // Add user to list of people going
+            getReqAttendees();
+        });
+    }
+}
+function buildUserReqWindow() {
+    var page = $("body");
+    // Build create request box
+    page.after(
+        "<div id=\"userReq\" class=\"userEntry\">" +
+        "<h3>Your Request</h3>" +
+        "<h3>Max Attendees</h3>" +
+        "<div class='button' id=\"delButton\">Delete Request</div>" +
+        "<div class='button' id=\"cButton\">Cancel</div>" +
+        "</div>");
+
+    $("#delButton").click(function(e) {
+        deleteRequest(selectedReqID);
+    });
+    $("#cButton").click(function(){
+        $("#createReq").remove();
+    });
+    hoverColorShift($(".button"));
+}
+function populateUserAtt(data) {
+    userAttData = data;
+    var userAttList = $("#userAttendList");
+    for (var i = 0; i < data.length; i++) {
+        userAttList.append("<div class='button' id='ua" + data[i].requestID + "'>" + data[i].concert + "</div>");
+        $("#re" + i).click(function(ev){
+            selectedReqID = ev.target.id.substring(2);
+        });
+    }
 }
 
 
