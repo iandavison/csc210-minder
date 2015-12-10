@@ -53,6 +53,24 @@ function userHomePage(user, pass) {
     getConcerts();
 
 }
+
+/*
+ * Will contain an ajax call to get requests/user
+ *
+ *
+ */
+function requestsSideBar(user) {
+
+}
+
+/*
+ * Will contain an ajax call to get attendance/user
+ *
+ *
+ */
+function attendanceSideBar(user) {
+
+}
 //Function for building user login
 function buildLoginWindow() {
     var banner = $("#topBanner");
@@ -230,7 +248,7 @@ function buildCreateReqWindow() {
         if(maxAttend.val().length == 0) {maxAttend.css("background", "#FF7777"); fail = true;}
         else {maxAttend.css("background", "#FFFFFF");}
         if(!fail) {
-            createRequest(showData[selectedShowIndex].displayName, cookieToUser(document.cookie), maxAttend.val(), 1, showData[selectedShowIndex].start.dateTime, showData[selectedShowIndex].location.city);
+            createRequest(showData[selectedShowIndex].displayName, cookieToUser(document.cookie), maxAttend.val(), 1, showData[selectedShowIndex].start.datetime, showData[selectedShowIndex].location.city);
         }
 
     });
@@ -242,6 +260,7 @@ function buildCreateReqWindow() {
 function populateShowReqs(data) {
     //Collect interesting data
     reqData = data;
+
     //Collect container
     var parentShow = $("#sh" + selectedShowIndex);
     var prevList = $("#reqList"+ selectedShowIndex);
