@@ -142,7 +142,7 @@ app.get('/attendees/*', function (req, res) {
     var db = new sqlite.Database("users.db");
     var requestID = req.params[0];
 
-    db.all("SELECT * FROM Attendees WHERE requestID = \"" + requestID +"\"" , function(err, rows) {
+    db.all("SELECT * FROM Attendees WHERE requestID = ?", requestID, function(err, rows) {
         console.log(err);
         res.send(JSON.stringify(rows));
     });
@@ -205,7 +205,7 @@ app.get('/attendance/*', function (req, res) {
         "Requests.concertDate, " +
         "Requests.location " +
         "FROM Requests, Attendees " +
-        "WHERE Requests.requestID = Attendees.requestID AND Attendees.user = \"" + user +" \"" , function(err, rows) {
+        "WHERE Requests.requestID = Attendees.requestID AND Attendees.user = \"" + user +"\"" , function(err, rows) {
         console.log(err);
         res.send(JSON.stringify(rows));
     });

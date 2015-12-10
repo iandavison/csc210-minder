@@ -103,7 +103,7 @@ function getUserReq(user) {
         success: function(data) {
             console.log(JSON.parse(data));
             if(data != "[]") {
-
+                populateUserReq(JSON.parse(data));
             }
         },
         error: function(data) {
@@ -118,6 +118,7 @@ function getUserAtt(user) {
         success: function(data) {
             console.log(JSON.parse(data));
             if(data != "[]") {
+                populateUserAtt(JSON.parse(data));
             }
         },
         error: function(data) {
@@ -137,6 +138,21 @@ function getShowReq() {
             }
             else{
                 populateShowReqs(JSON.parse(data));
+            }
+        },
+        error: function(data) {
+            console.log("ERROR");
+        }
+    });
+}
+function getReqAttendees() {
+    $.ajax({
+        method: "GET",
+        url: "attendees/" + selectedReqID,
+        success: function(data) {
+            console.log(data);
+            if(data != "[]") { //No requests for that show
+                buildUserReqWindow(JSON.parse(data));
             }
         },
         error: function(data) {
@@ -167,7 +183,29 @@ function createRequest(concert, user, numCanAttend, numCurAttend, concertDate, c
         }
     });
 }
+function deleteRequest() {
+    //Submit finished product
+    $.ajax({
+        type: "DELETE",
+        dataType: "text",
+        url: "requests/" + selectedReqID,
+        success: function(data) {
+            if(data == "OK") {
+                console.log("Concert Request Created");
+                //Remove login block
+                $("#userReq").remove();
+                $("#ur" + selectedReqID).remove();
+            }
+            else{
+                console.log("ERROR: Could not create event")
+            }
 
+        },
+        error: function(data) {
+            console.log("ERROR");
+        }
+    });
+}
 function addAttendee(user, reqID) {
     $.ajax({
         type: "POST",
