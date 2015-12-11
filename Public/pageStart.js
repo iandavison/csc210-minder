@@ -162,13 +162,15 @@ function buildUpdateUser() {
         return;
     }
     banner.after(
-        "<div id=\"userUpdate\" class=\"userEntry\">" +
+        "<div id=\"userUpdate\" class=\"userEntry\" style='z-index: 4'>" +
         "<h3>User Name</h3>" +
         "<input id=\"newUserName\" class=\"editText\" type=\"text\" name=\"newUserName\" placeholder=\"User Name\">" +
         "<h3>Password</h3>" +
         "<input id=\"newPassword\" class=\"editText\" type=\"text\" name=\"newPassword\" placeholder=\"Password\">" +
         "<div class='button' id=\"upButton\" onclick=\"submitUserUpdate()\">Update</div>" +
+        "<div class='button' id=\"cButton\">Cancel</div>" +
         "</div>");
+    $("#cButton").click(function(){$("#userUpdate").remove();});
 
 }
 function submitUserUpdate() {
@@ -218,7 +220,7 @@ function buildDeleteUser() {
         return;
     }
     banner.after(
-        "<div id=\"userDelete\" class=\"userEntry\">" +
+        "<div id=\"userDelete\" class=\"userEntry\" style='z-index: 4;'>" +
         "<button id=\"button\" onclick=\"deleteUser()\">Delete</>" +
         "</div>");
 }
